@@ -1,0 +1,110 @@
+{% extends 'admin_templates/base_admin.html' %}
+{% load static %}
+
+{% block content %}
+<section class="section-conten" style="min-height:84vh">
+	
+	<!-- ============================ COMPONENT LOGIN   ================================= -->
+        <div class="container">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title fw-semibold mb-4">Update product</h5>
+              <div class="card">
+                <div class="card-body">
+                  <form method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="mb-3 col-6">
+                            <label for="id_product_name" class="form-label">Product name:</label>
+                            {{form.product_name}}
+                        </div>
+                        <div class="mb-3 col-6">
+                            <label for="id_brand" class="form-label">Brand name:</label>
+                            {{ form.brand }}
+                          </div>
+                          
+                          <div class="mb-3 col-6">
+                            <label for="id_category" class="form-label">Product category:</label>
+                            <select class="form-control" id="id_category" name="category">
+                              {% for x, y in form.fields.category.choices %}
+                              <option value="{{ x }}" {% if form.category.value == x %} selected{% endif %}>{{ y }}</option>
+                              {% endfor %}
+                          </select>
+                        </div>
+                        
+                        <div class="mb-3 col-12">
+                          <label for="id_description" class="form-label">Product description</label>
+                          {{ form.description }}
+                        </div>
+                        <div class="mb-3 col-6">
+                            <label for="id_price" class="form-label">Price</label>
+                            {{ form.price }}
+                        </div>
+
+                        <div class="mb-3 col-6">
+                            <label for="id_stock" class="form-label">Quantity in stock</label>
+                            {{ form.stock }}
+                        </div>
+
+
+
+
+
+
+
+                        <p>{{form.errors}}</p>
+                        <div class="mb-3 col-12">
+                          <label for="id_images" class="form-label">Product image</label>
+                          <div class="d-flex  justify-content-start">
+                            <div>
+                              <img class="image-form" src="{{product.images.url}}" alt="">
+                            </div>
+                            <div class=" col-6 ms-4 d-flex flex-column justify-content-center">
+                              {{ form.images }}
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div class="form-row mt-4">
+                          <p class="form-label">Additional images</p>
+                          
+                          {% for prod_image in prod_images %}
+                          
+                          <div class="d-flex justify-content-start mb-3">
+                            <div class="image-form">
+                              <img class="image-form mt-1" src="{{prod_image.image.url}}" alt="">
+                            </div>
+                            <div class=" col-6 ms-4 d-flex flex-column justify-content-center">
+                              <label for="photo{{forloop.counter}}" class="form-label"></label>
+                              <input type="file" class="form-control" id="photo{{forloop.counter}}" name ="add_image{{forloop.counter}}" accept=".jpg,.jpeg,.WEBP,.png">
+                              <input type="text" hidden value="{{prod_image.id}}" name="product-image{{forloop.counter}}">
+                            </div>
+                          </div>  
+                          
+                          {% endfor %}
+                        
+                        
+                        </div>
+                        
+                        <div class="row mt-4">
+                          <hr>
+                            <div class="d-flex justify-content-center align-items-baseline mt-3 col px-3 mb-2">
+                                <button type="submit" class="btn btn-primary me-3">Update product</button>
+                            </div>
+                        </div>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- card .// -->
+
+     <!-- <p class="text-center mt-4">Don't have account? <a href="{% url 'user_signup' %}">Sign up</a></p> -->
+     <br><br>
+<!-- ============================ COMPONENT LOGIN  END.// ================================= -->
+
+
+</section>
+{% endblock %}

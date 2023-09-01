@@ -1,0 +1,77 @@
+
+{% extends 'admin_templates/meta_admin.html' %}
+
+{% load static %}
+
+{% block meta %}
+<!--  Body Wrapper -->
+  <div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full"
+    data-sidebar-position="fixed" data-header-position="fixed">
+    <div
+      class="position-relative overflow-hidden radial-gradient min-vh-100 d-flex align-items-center justify-content-center">
+      <div class="d-flex align-items-center justify-content-center w-100">
+        <div class="row justify-content-center w-100">
+          <div class="col-4">
+              <div class="card mb-0">
+                <div class="card-body">
+                    <a href="{% url 'admin-home' %}" class="text-nowrap logo-img text-center d-block py-3 w-100">
+                        <img src="{% static './images/logos/logo.png' %}" width="180" alt="">
+                      </a>
+                      <br><br>
+                    <!-- {% if messages %}
+                    {% for message in messages %}
+                      <p {% if message.tags %} class="{{ message.tags }} p-0 m-0 text-danger bg-light" {% endif %}>
+                        {{ message }}</p>
+                    {% endfor %}
+                    {% endif %} -->
+
+                    <form method = 'POST'>
+                      {% csrf_token %}
+                      <div class="mb-3">
+                        <label for="phone_number" class="form-label ms-3 fw-bold text-dark">Phone number:</label>
+                        <br>
+                        <input type="text" name="phone_number" placeholder="Enter your registered phone number" class="form-control" id="phone_number">
+                      </div>
+                      {% if messages %}
+                      {% for message in messages %}
+                        <p {% if message.tags %} class="{{ message.tags }} p-0 m-0 text-danger bg-light" {% endif %}>
+                          {{ message }}</p>
+                      {% endfor %}
+                      {% endif %}
+                        <br>
+                        <!-- <div class="mb-4">
+                            <label for="OTP" class="form-label">otp:</label>
+                            <input type="text" name="otp" class="form-control" id="OTP">
+                        </div> -->
+                        <button type="submit" class="btn btn-primary w-100 py-8  fs-2 mb-4 rounded-2">Send OTP</button>
+                    </form>
+                    <!-- <p class="text-danger p-2">OTP send successfully</p> -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- <script type="text/javascript">
+    $(document).on('submit', '#post-form', function(e){
+      e.preventDefault();
+      $.ajax({
+        type: 'POST',
+        url: '/loginwithotp',
+        data: {
+          phone_number: $('#phone_number').val(),
+          csrfmiddlewaretoken: $('input[name = csrfmiddlewaretoken]').val()
+        },
+        success: function(data){
+          ('p').html(data)
+        }
+      })
+    })
+
+
+  </script> -->
+  <script src="../assets/libs/jquery/dist/jquery.min.js"></script>
+  <script src="../assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+
+{% endblock %}

@@ -1,0 +1,77 @@
+{% extends 'admin_templates/base_admin.html' %}
+{% load static %}
+
+{% block content %}
+<section class="section-conten" style="min-height:84vh">
+	
+	<!-- ============================ COMPONENT LOGIN   ================================= -->
+        <div class="container">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title fw-semibold mb-4">Update user</h5>
+              <div class="card">
+                <div class="card-body">
+                  <form method="POST">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="mb-3 col-6">
+                            <label for="id_first_name" class="form-label">First name:</label>
+                            {{form.first_name}}
+                        </div>
+                        <div class="mb-3 col-6">
+                            <label for="id_last_name" class="form-label">Last name:</label>
+                            {{ form.last_name }}
+                        </div>
+                        
+                        <div class="mb-3 col-6">
+                            <label for="id_email" class="form-label">Email address</label>
+                            {{ form.email }}
+                            <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>
+                        </div>
+
+                        <div class="mb-3 col-6">
+                            <label for="id_phone_number" class="form-label">Phone number</label>
+                            {{ form.phone_number }}
+                        </div>
+                        <div>
+                            <br><br>
+                            <div class="mb-3 col-6">
+                                <label for="id_is_superadmin" class="form-label">Is superadmin</label>
+                                {{ form.is_superadmin }}
+                            </div>
+                            <div class="mb-3 col-6">
+                                <label for="id_is_superadmin" class="form-label">Is staff</label>
+                                {{ form.is_staff }}
+                            </div>
+                            <div class="mb-3 col-6">
+                                <label for="id_is_superadmin" class="form-label">Is active</label>
+                                {{ form.is_active }}
+                            </div>
+                        </div>
+
+                        <!-- <div class="mb-3 col-6">
+                            <label for="id_password" class="form-label">Password</label>
+                            {{form.password}}
+                            <input type="password" class="form-control" id="id_password">
+                        </div> -->
+                        <div class="row">
+
+                            <div class="d-flex justify-content-center align-items-baseline col px-3 mb-2">
+                                <button type="submit" class="btn btn-primary me-3">Update</button>
+                            </div>
+                        </div>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- card .// -->
+
+     <!-- <p class="text-center mt-4">Don't have account? <a href="{% url 'user_signup' %}">Sign up</a></p> -->
+<!-- ============================ COMPONENT LOGIN  END.// ================================= -->
+
+
+</section>
+{% endblock %}

@@ -1,0 +1,119 @@
+{% extends 'admin_templates/base_admin.html' %}
+{% load static %}
+
+{% block content %}
+<section class="section-conten" style="min-height:84vh">
+	
+	<!-- ============================ COMPONENT LOGIN   ================================= -->
+        <div class="container">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title fw-semibold mb-4">Add product</h5>
+              <div class="card">
+                <div class="card-body">
+                  <form method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="mb-3 col-6">
+                            <label for="id_product_name" class="form-label">Product name:</label>
+                            {{form.product_name}}
+                        </div>
+                        <div class="mb-3 col-6">
+                            <label for="id_brand" class="form-label">Brand name:</label>
+                            {{ form.brand }}
+                        </div>
+                        
+                        <div class="mb-3 col-6">
+                            <label for="id_category" class="form-label">Category:</label>
+                            <select class="form-control" id="id_category" name="{{ form.category.name }}">
+                                <option value="" selected>Select</option>
+                                {% for choice in form.category.field.choices %}
+                                {% if choice.0 %}
+                                    <option  value="{{ choice.0 }}">{{ choice.1 }}</option>
+                                {% endif %}
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="mb-3 col-12">
+                            <label for="id_description" class="form-label">Product description:</label>
+                            {{ form.description }}
+                        </div>
+
+                        <div class="mb-3 col-6">
+                            <label for="id_price" class="form-label">Price:</label>
+                            {{ form.price }}
+                        </div>
+                        <div class="mb-3 col-6">
+                            <label for="id_price" class="form-label">Quantity in stock:</label>
+                            {{ form.stock }}
+                        </div>
+
+                        <div class="mb-3 col-6">
+                            <label for="id_is_available" class="form-label">Is available:</label>
+                            {{ form.is_available }}
+                        </div>
+                        
+                        <div class="mb-3 col-12">
+                            <label for="id_price" class="form-label">Product image:</label>
+                            {{ form.images }}
+                        </div>
+                        <p class="form-label">Additional images:</p>
+                        <div class="form-row">
+                            <div class="mb-3 col-md-6">
+                                <input type="file" class="form-control" id="photo" name="add_image1" accept=".jpg,.jpeg,.webp,.png">
+                            </div>
+                            <div class="mb-3 col-6">
+                                <input type="file" class="form-control" id="photo" name="add_image2" accept=".jpg,.jpeg,.webp,.png">
+                            </div>
+                            <div class="mb-3 col-6">
+                                <input type="file" class="form-control" id="photo" name="add_image3" accept=".jpg,.jpeg,.webp,.png">
+                            </div>
+                            <div class="mb-3 col-6">
+                                <input type="file" class="form-control" id="photo" name="add_image4" accept=".jpg,.jpeg,.webp,.png">
+                            </div>
+                        </div>
+                        <!-- <div class="form-row">
+                          <div class="form-group col-md-6"> -->
+                              <!-- <label>Quantity in stock</label>
+                              <input class="form-control" name="stock" type="password"> -->
+                          <!-- </div> form-group end.//  -->
+                          <!-- <div class="form-group col-md-6"> -->
+                              <!-- <label>Repeat password</label>
+                              <input class="form-control" name="confirm-password" type="password"> -->
+                        <!-- </div> form-group end.//  
+                        </div> -->
+                        <!-- <div>
+                            <br><br>
+                            <div class="mb-3 col-6">
+                                <label for="id_is_available" class="form-label">Is available</label>
+                                {{ form.is_available }}
+                            </div>
+                        </div> -->
+                        
+                        <!-- <div class="mb-3 col-6">
+                            <label for="id_password" class="form-label">Password</label>
+                            {{form.password}}
+                            <input type="password" class="form-control" id="id_password">
+                        </div> -->
+                        <div class="row">
+                            
+                            <div class="d-flex justify-content-center align-items-baseline col px-3 mb-2">
+                                <button type="submit" class="btn btn-primary me-3">Add product</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- card .// -->
+
+     <!-- <p class="text-center mt-4">Don't have account? <a href="{% url 'user_signup' %}">Sign up</a></p> -->
+     <br><br>
+<!-- ============================ COMPONENT LOGIN  END.// ================================= -->
+
+
+</section>
+{% endblock %}

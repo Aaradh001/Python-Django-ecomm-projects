@@ -1,0 +1,68 @@
+{% extends 'admin_templates/base_admin.html' %}
+{% load static %}
+
+{% block content %}
+<section class="section-conten" style="min-height:84vh">
+	
+	<!-- ============================ COMPONENT LOGIN   ================================= -->
+        <div class="container">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title fw-semibold mb-4">Create category</h5>
+              <div class="card">
+                <div class="card-body">
+                  <form method="POST">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="mb-3 col-6">
+                            <label for="id_category_name" class="form-label">Category name:</label>
+                            {{form.category_name}}
+                        </div>
+                        <div class="mb-3 col-6">
+                            <label for="id_parent" class="form-label">Parent category:</label>
+                            <select class="form-control" id="id_parent" name="{{ form.parent.name }}">
+                                <option value="" selected>Select</option>
+                                {% for choice in form.parent.field.choices %}
+                                {% if choice.0 %}
+                                    <option  value="{{ choice.0 }}">{{ choice.1 }}</option>
+                                {% endif %}
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <br><br>
+                            <div class="mb-3 col-6">
+                                <label for="id_is_valid" class="form-label">Category is valid or not:</label>
+                                {{ form.is_valid }}
+                            </div>
+                            <divv>
+                        </div>
+
+                        <!-- <div class="mb-3 col-6">
+                            <label for="id_password" class="form-label">Password</label>
+                            {{form.password}}
+                            <input type="password" class="form-control" id="id_password">
+                        </div> -->
+                        <div class="row">
+
+                            <div class="d-flex justify-content-center align-items-baseline col px-3 mb-2">
+                                <button type="submit" class="btn btn-primary me-3">Add category</button>
+                            </div>
+                        </div>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- card .// -->
+
+     <!-- <p class="text-center mt-4">Don't have account? <a href="{% url 'user_signup' %}">Sign up</a></p> -->
+     <br><br>
+<!-- ============================ COMPONENT LOGIN  END.// ================================= -->
+
+
+</section>
+{% endblock %}

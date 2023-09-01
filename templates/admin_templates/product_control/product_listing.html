@@ -1,0 +1,109 @@
+{% extends 'admin_templates/base_admin.html' %}
+{% load static %}
+
+{% block content %}
+<div class="row">
+  {% if messages %}
+	{% for message in messages %}
+	<p {% if message.tags %} class="{{ message.tags }} p-0 m-0 text-danger bg-light" {% endif %}>
+		{{ message }}</p>
+	{% endfor %}
+	{% endif %}
+    <div class="col-lg-12 d-flex align-items-stretch">
+      <div class="card w-100">
+        <div class="card-body p-4">
+          <div class="d-flex justify-content-between align-items-center">
+            <h5 class="col card-title fw-semibold m-0 ">Products</h5>
+          </div>
+          <div class="table-responsive">
+            <table class="table text-nowrap align-items-center mb-0 align-middle">
+              <thead class="text-dark fs-4">
+                <tr>
+                  <th class="border-bottom-0">
+                    <h6 class="fw-semibold mb-0">Product ID</h6>
+                  </th>
+                  <th class="border-bottom-0">
+                    <h6 class="fw-semibold mb-0">Product image</h6>
+                  </th>
+                  <th class="border-bottom-0">
+                    <h6 class="fw-semibold mb-0">Product name</h6>
+                  </th>
+                  <th class="border-bottom-0">
+                    <h6 class="fw-semibold mb-0">Brand name</h6>
+                  </th>
+                  <th class="border-bottom-0">
+                    <h6 class="fw-semibold mb-0">Category</h6>
+                  </th>
+                  <th class="border-bottom-0">
+                    <h6 class="fw-semibold mb-0">Price</h6>
+                  </th>
+                  <th class="border-bottom-0">
+                    <h6 class="fw-semibold mb-0">Stock (in Nos)</h6>
+                  </th>
+                  <th class="border-bottom-0">
+                    <h6 class="fw-semibold mb-0">Is available</h6>
+                  </th>
+                  <th class="border-bottom-0">
+                    <h6 class="fw-semibold mb-0">Action</h6>
+                  </th>
+                </tr>
+              </thead>
+              
+                {% for product in products %}
+                <tr>
+                  <td class="border-bottom-0">
+                    <h6 class="fw-normal tablecontent mb-1">{{ forloop.counter }}</h6>
+                    <a href="{% url 'product_update' product.id %}"><img class="mb-1" src="{% static './images/extras/pencil-square.svg' %}" alt="edit"></a>
+                    <!---->
+                  </td>
+                  <td class="border-bottom-0">
+
+                    <img class="prod-img-inlist" src="{{ product.images.url }}" alt="">
+                  </td>
+                  <td class="border-bottom-0">
+                    <h6 class="fw-normal mb-1">{{product.product_name}}</h6>
+                  </td>
+                  <td class="border-bottom-0">
+                    <h6 class="fw-normal mb-1">{{product.brand}}</h6>
+                  </td>
+                  <td class="border-bottom-0">
+                    <h6 class="fw-normal mb-1">{{product.category}}</h6>
+                  </td>
+                  <td class="border-bottom-0">
+                      <h6 class="fw-normal mb-1 ">{{product.price}}</h6>
+                  </td>
+                  <td class="border-bottom-0">
+                    <p class="mb-1 fw-normal">{{product.stock}}</p>
+                  </td>
+                  <td class="border-bottom-0">
+                    <div class="mb-1">
+                      <!-- <span class="badge bg-primary rounded-3 fw-semibold"> -->
+                        {% if product.is_available %}
+                        Enabled
+                        {% else %}
+                        Disabled
+                        {% endif %}
+                      <!-- </span> -->
+                    </div>
+                  </td>
+                  <td class="border-bottom-0">
+                    {% if product.is_available %}
+                    <a href="{% url 'product_control' product.id %}">
+                      <button class="btn btn-danger mb-1 px-3">Disable</button>
+                    </a>
+                    {% else %}
+                    <a href="{% url 'product_control' product.id %}">
+                      <button class="btn btn-success mb-1">Enable</button>
+                    </a>
+                    {% endif %}
+                  </td>
+                </tr> 
+                {% endfor %}                    
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endblock %}

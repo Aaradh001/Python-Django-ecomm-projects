@@ -1,0 +1,116 @@
+{% load static %}
+<header class="section-header">
+    {% include 'includes/navbar.html' %}
+    
+    <section class="header-main border-bottom">
+        <div class="container">
+    <div class="row align-items-center">
+        <div class="col-lg-2 col-md-3 mr-5 col-6">
+            <a href="{% url 'user_home' %}" class="brand-wrap">
+                <img class="logo" src="{% static './images/logo.png' %}">
+            </a> <!-- brand-wrap.// -->
+        </div>
+        <div class="col-lg col-sm col-md col-6 flex-grow-0">
+            <div class="category-wrap dropdown d-inline-block float-right">
+                <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown"> 
+                    <i class="fa fa-bars"></i> All category 
+                </button>
+
+
+                
+                
+                <div class="dropdown-menu">
+                    {% if links %}
+                    {% for category in links %}
+                    <a class="dropdown-item" href="{% url 'product_by_category' category.cat_slug %}">{{category.category_name}}</a>
+                    {% endfor %}
+                    {% endif %}
+                    
+                </div>
+            </div>  <!-- category-wrap.// -->
+        </div> <!-- col.// -->
+        <a href="{% url 'product_store' %}" class="btn btn-outline-primary">Store</a>
+        <div class="col-lg  col-md-6 col-sm-12 col">
+            <form action="#" class="search">
+                <div class="input-group w-100">
+                    <input type="text" class="form-control" style="width:60%;" placeholder="Search">
+                    
+                    <div class="input-group-append">
+                        <button class="btn btn-primary" type="submit">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+            </form> <!-- search-wrap .end// -->
+        </div> <!-- col.// -->
+        <div class="col-lg-3 col-sm-6 col-8 order-2 order-lg-3">
+            <div class="d-flex justify-content-end mb-3 mb-lg-0">
+                {% if not request.user.is_authenticated %}
+                
+                <div class="widget-header">
+                    <!-- {% if not username %} -->
+                    <small class="title text-muted">Welcome guest!</small>
+                    <div class="d-flex flex-row justify-content-between"> 
+                        <a href="{% url 'signin' %}">Sign in</a>
+                        <span class="dark-transp"> | </span>
+                        <a href="{% url 'user_signup' %}"> Register</a>
+                    </div>
+                    <!-- {% else %} -->
+                    <!-- <small class="title text-muted">Welcome {{username}}guest!</small>
+                        <div class="d-flex flex-row justify-content-between"> 
+                            <a href="{% url 'signin' %}">Sign in</a>
+                            <span class="dark-transp"> | </span>
+                            <a href="./register.html"> Register</a>
+                        </div>
+                        {% endif %} -->
+                        
+                    </div>
+                    
+                    {% else %}
+                    
+                    <div class="widget-header-after-login">
+                        <div> 
+                            <a href="{% url 'signin' %}">
+                                <img src="{% static 'images/icons/profileuser.svg' %}">
+                            </a> 
+                            <div class="category-wrap dropdown d-inline-block">
+                                <button type="button" class="btn btn-transparent dropdown-toggle" data-toggle="dropdown"> 
+                                    {{username}} 
+                                </button>
+                                <ul class="dropdown-menu profile-dropdown">
+                                    <li><a class="dropdown-item" href="{% url 'dashboard' %}">Dashboard</a></li>
+                                    <li><a class="dropdown-item" href="#">Profile</a></li>
+                                    <li><a class="dropdown-item" href="#">Orders</a></li>
+                                    <li><a class="dropdown-item" href="#">Wishlist</a></li>
+                                    <li><a class="dropdown-item" href="#">Coupons</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'signout' %}">Logout</a></li>
+                                    <!-- <a class="dropdown-item" href="#">Machinery / Mechanical Parts / Tools </a>
+                                    <a class="dropdown-item" href="#">Consumer Electronics / Home Appliances </a>
+                                    <a class="dropdown-item" href="#">Auto / Transportation</a>
+                                    <a class="dropdown-item" href="#">Apparel / Textiles / Timepieces </a>
+                                    <a class="dropdown-item" href="#">Home & Garden / Construction / Lights </a>
+                                    <a class="dropdown-item" href="#">Beauty & Personal Care / Health </a>  -->
+                                    </ul>
+                            </div>  <!-- category-wrap.// -->
+                        </div>
+                        <!-- <div class="dropdown">
+                            <button class="btn btn-transparent dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                {{username}}
+                            </button>
+                                <ul class="dropdown-menu">
+                                </ul>
+                            </div> -->
+                        </div>
+
+                        {% endif %}
+                        <a href="{% url 'cart' %}" class="widget-header pl-3 ml-3">
+                            <div class="icon icon-sm rounded-circle border"><i class="fa fa-shopping-cart"></i></div>
+                            <span class="badge badge-pill badge-danger notify">{{ cart_count }}</span>
+                        </a>
+                    </div> <!-- widgets-wrap.// -->
+                </div> <!-- col.// -->
+    </div> <!-- row.// -->
+        </div> <!-- container.// -->
+    </section> <!-- header-main .// -->
+    
+    </header> 

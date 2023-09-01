@@ -1,0 +1,139 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+{% include 'includes/header.html' %}
+{% load static %}
+<section class="section-content padding-y bg">
+    <div class="container">
+        
+        <!-- ============================ COMPONENT 2 ================================= -->
+        <div class="row">
+            <main class="col-md-8">
+
+                <article class="card mb-4">
+                    <div class="card-body">
+                        <h4 class="card-title mb-4">Review cart</h4>
+                        <div class="row">
+                            {% for cart_item in cart_items %}
+
+                            <div class="col-md-6">
+                                <figure class="itemside  mb-4">
+                                    <div class="aside"><img src="{{cart_item.product.images.url}}" class="border img-sm"></div>
+                                    <figcaption class="info">
+                                        <a href="{{cart_item.product.get_url}}" class="title text-dark">{{cart_item.product.product_name}} {{cart_item.product.brand}}</a>
+                                        <p class="text-muted small">Matrix: 25 Mpx <br> Brand: {{cart_item.product.brand}}</p>
+                                    </figcaption>
+                                </figure>
+                            </div> <!-- col.// -->
+                            
+                            {% endfor %}
+                        </div> <!-- row.// -->
+                    </div> <!-- card-body.// -->
+                </article> <!-- card.// -->
+
+                <article class="card mb-4">
+                    <div class="card-body">
+                        <h4 class="card-title mb-4">Customer Details</h4>
+                        <div class="form-row mb-4">
+                            <div class="col-12 row">
+                                <div class="col-2">
+                                    <label class="m-0 text-muted" for="name">Name :</label>
+                                </div>
+                                <div class="col">
+                                    <input id="name" type="text" value="{{user.first_name}} {{user.last_name}}" class="border-0 font-weight-bold" readonly>
+                                </div>
+                            </div>
+                            <div class="col-12 row">
+                                <div class="col-2">
+                                    <label class="m-0 text-muted" for="email">Email :</label>
+                                </div>
+                                <div class="col">
+                                    <input id="email" type="email" value="{{user.email}}" class="border-0 font-weight-bold" readonly>
+                                </div>
+                            </div>
+                        </div>
+                    </div> <!-- card-body.// -->
+                </article> <!-- card.// -->
+
+
+                <article class="card mb-4">
+                    <div class="card-body">
+                        <h4 class="card-title mb-4">Delivery info</h4>
+                                <div class="form-row row ">
+                                    <!-- need to align html -->
+                                    <div class="form-group">
+                                        {{shipping_address.name}}
+                                        {{shipping_address.phone}},<br>
+                                        {{shipping_address.address_line_1}},
+                                        {{shipping_address.address_line_2}},<br>
+                                        {{shipping_address.city}},
+                                        {{shipping_address.state}},<br>
+                                        {{shipping_address.country}},<br>
+                                        {{shipping_address.pincode}},
+                                    </div>
+                                </div>
+                    </div> <!-- card-body.// -->
+                </article> <!-- card.// -->
+
+                <form action="{% url 'order_complete' order.order_number %}" id="payment-form" method="post">
+                    {% csrf_token %}
+                    <input type="text" hidden value="{{order.order_number}}" id="order_number_order_summary" name="order_number_order_summary">
+                <article class="accordion" id="accordion_pay">
+                        <div class="card">
+                            {% for payment_method in payment_methods %}
+                            <header class="card-header">
+                                <label class="form-check collapsed" data-toggle="collapse" data-target="#pay_paynet">
+                                    <input class="form-check-input" name="payment_option" checked type="radio" value="{{payment_method.id}}">
+                                    <h6 class="form-check-label"> 
+                                        {{payment_method.method_name}} 
+                                    </h6>
+                                </label>
+                            </header>
+                            {% endfor %}
+                        </div>
+                </article> 
+            <!-- accordion end.// -->
+                
+            </main> <!-- col.// -->
+            <aside class="col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <dl class="dlist-align">
+                            <dt>Total price:</dt>
+                            <dd class="text-right">&#8377;{{total}}</dd>
+                        </dl>
+                        <dl class="dlist-align">
+                            <dt>Tax:</dt>
+                            <dd class="text-right"> &#8377;{{tax}}</dd>
+                        </dl>
+                        <dl class="dlist-align">
+                            <dt>Grand Total:</dt>
+                            <dd class="text-right text-dark b"><strong>&#8377;{{grand_total}}</strong></dd>
+                        </dl>
+                        <hr>
+                        <p class="text-center mb-3">
+                            <img src="{% static './images/misc/payments.png' %}" height="26">
+                        </p>
+                        <button type="submit" class="btn btn-primary btn-block"> Place Order </button>
+                    </form>
+                    </div> <!-- card-body.// -->
+                </div> <!-- card.// -->
+            </aside> <!-- col.// -->
+        </div> <!-- row.// -->
+
+    <!-- ============================ COMPONENT 2 END//  ================================= -->
+
+
+
+
+    </div> <!-- container .//  -->
+</section>
+<!-- ========================= SECTION CONTENT END// ========================= -->
+
+
+<!-- ========================= SECTION CONTENT END// ========================= -->
+
+
+
+{% endblock %}

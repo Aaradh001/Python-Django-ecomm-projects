@@ -1,0 +1,109 @@
+.category-dropdown{
+    transform: translate(0, 50px) !important;
+    background-color: rgb(243, 238, 238);
+    border-radius: 15px;
+}
+.cat-dropdown{
+    padding-right: 0 !important;
+}
+.inside-cat-dropdown{
+    padding-left: 0 !important;
+}
+
+.toggle-button-cover-random {
+    /* display: table-cell;
+    position: relative;
+    width: 200px;
+    height: 140px;
+    box-sizing: border-box; */
+    /* display: table-cell; */
+    position: relative;
+    width: 40px;
+    height: 22px;
+    box-sizing: border-box;
+
+  }
+  
+  /* .button-cover-random {
+    height: 20px;
+    width: 20px;
+    background-color: #fff;
+    box-shadow: 0px 0px 13px 6px #c5d6d6;
+    border-radius: 20px;
+  } */
+  
+  
+  .button-cover-random,
+  .knobs-random,
+  .layer-random {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+  }
+  
+  .button-random {
+    position: relative;
+    top: 87%;
+    width: 40px;
+    height: 22px;
+    margin: -20px auto 0 auto;
+    overflow: hidden;
+  
+  }
+  
+  .button.r-random,
+  .button.r-random.layer-random {
+    border-radius: 100px;
+  }
+  
+  .button.b2-random {
+    border-radius: 2px;
+  }
+  
+  .checkbox-random {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    margin: 0;
+    opacity: 0;
+    cursor: pointer;
+    z-index: 3;
+  }
+  
+  .knobs-random {
+    z-index: 2;
+  }
+  
+  
+  /* Button 1 */
+  #button-1-random .knobs-random:before {
+    content: "";
+    position: absolute;
+    top: 6px;
+    left: 4px;
+    width: 13px;
+    height: 0px;
+    padding: 7px 0px;
+    background-color: #f10627;
+    border-radius: 50%;
+    transition: 0.3s cubic-bezier(0.18, 0.89, 0.35, 1.15) all;
+  }
+  
+  #button-1-random .checkbox-random:checked + .knobs-random:before {
+    content: "";
+    left: 23px;
+    background-color: #25d51a;
+  }
+  
+  #button-1-random .checkbox-random:checked ~ .layer-random {
+    background-color: #fcebeb;
+  }
+  
+  #button-1-random .knobs-random,
+  #button-1-random .knobs-random:before,
+  #button-1-random .layer-random {
+    transition: 0.3s ease all;
+  }

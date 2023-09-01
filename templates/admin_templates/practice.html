@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://code.jquery.com/jquery-3.7.0.js" integrity="sha256-JlqSTELeR4TLqP0OG9dxM7yDPqX1ox/HfgiSLBj8+kM=" crossorigin="anonymous"></script>
+    <title>Document</title>
+</head>
+<body>
+    <h1>Welcome</h1>
+    <form id="post-form">
+        {% csrf_token %}
+        <p>Name:</p>
+        <input type="text" name="name" id="para1">
+        <p>Email:</p>
+        <input type="email" name="email" id="para2">
+        <p>Bio:</p>
+        <input type="text" name="bio" id="para3">
+        <input type="submit">
+    </form>
+
+</body>
+<script>
+    $(document).on('submit', '#post-form', function(e){
+        e.preventDefault();
+        $.ajax({
+            type: 'POST',
+            url: '',
+            data:{
+                name: $('#para1').val(),
+                email: $('#para2').val(),
+                bio: $('#para3').val(),
+                csrfmiddlewaretoken: $('input[name = csrfmiddlewaretoken]').val()
+            },
+            success: function(){
+
+            }
+        });
+    });
+
+
+
+</script>
+
+
+</html>

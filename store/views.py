@@ -6,7 +6,21 @@ from store.models import Product, ProductImage
 from django.db.models import Q
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.views.decorators.cache import cache_control
+from django.http import HttpResponse
 # Create your views here.
+
+
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+def home(request):
+    products = Product.objects.filter(is_available = True)
+    context = {
+        'products': products,
+    }
+    
+    return render(request, 'index.html', context)
+
+
+
 
 
 def product_store(request, cat_slug = None):
@@ -39,7 +53,8 @@ def product_store(request, cat_slug = None):
         paged_products = paginator.get_page(page)
     
     context = {
-        'products'      : paged_products,
+        'products'       : paged_products,
+        'products_count' : products.count(),
         }
     
     return render(request, 'all_product_display.html', context)
@@ -66,3 +81,21 @@ def product_detail(request, cat_slug, prod_slug):
     }
 
     return render(request, 'product_detail.html',context)
+
+
+def search(request):
+    if 'keyword' in  request.GET:
+        keyword = request.GET['keyword']
+        print(keyword)
+        if keyword:
+            keywords = keyword.split(" ")
+            print(keywords)
+            products = []
+            for keyword in keywords:
+                products += Product.objects.order_by('-created_date').filter(Q(description__icontains = keyword) | Q(product_name__icontains = keyword) | Q(brand__icontains = keyword))
+            products = set(products)
+            context = {
+                'products'      : products,
+                'products_count' : len(products),
+            }
+    return render(request, 'all_product_display.html', context)

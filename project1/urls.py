@@ -21,9 +21,11 @@ from django.conf import settings
 from admin_control import views
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('accounts.urls')),
+    path('account/', include('accounts.urls')),
     path('admin-control/', include('admin_control.urls')),
     path('cart/', include('carts.urls')),
-    path('store/', include('store.urls')),
+    path('', include('store.urls')),
     path('orders/', include("orders.urls")),
+    path('wallet/', include("wallet_management.urls")),
+    # path('coupon/', include("coupon_management.urls")),
 ] + static(settings.MEDIA_URL, document_root = settings.MEDIA_ROOT)

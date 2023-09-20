@@ -11,18 +11,8 @@
     <!-- ============================ COMPONENT 1 ================================= -->
     <div class="row">
         <aside class="col-lg-6">
-            {% if messages %}
-            {% for message in messages %}
-            <div
-              class="alert alert-dismissible fade show {% if message.tags == 'error' %} alert-danger {% else %} alert-dark {% endif %}"
-              role="alert">
-              <strong>{{message.tags|title}} !</strong> {{message}}
-              <!-- <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button> -->
-            </div>
-        
-            {% endfor %}
-        
-        {% endif %}
+            {% include 'includes/alerts.html' %}
+
 
             <div class="card mb-4">
                 <div class="card-body">
@@ -90,7 +80,7 @@
                     <div class="form-check border border-dark my-2">
                         <div class="p-2">
                             
-                            <input value="{{ address.id }}" class="form-check-input" type="radio" name="address" id="address{{ forloop.counter }}" {% if address.is_default %}checked{% endif %}>
+                            <input value="{{ address.id }}" class="form-check-input" type="radio" name="address01" id="address{{ forloop.counter }}" {% if address.is_default %}checked{% endif %}>
                             <label class="form-check-label" for="address{{ forloop.counter }}">
                                 {{ address.get_user_full_address|slice:":80"|safe }}...
                             </label>
@@ -151,18 +141,20 @@
                         </tbody>
                     </table>
 
-                    <dl class="dlist-align">
-                        <dt>Total price:</dt>
-                        <dd class="text-right">Rs {{ total }}</dd>
-                    </dl>
-                    <dl class="dlist-align">
-                        <dt>Tax:</dt>
-                        <dd class="text-right text-danger">Rs {{ tax }}</dd>
-                    </dl>
-                    <dl class="dlist-align">
-                        <dt>Grand Total:</dt>
-                        <dd class="text-right text-dark b"><strong> <span id="grand_total_checkout">Rs {{ grand_total }} </span> </strong></dd>
-                    </dl>
+                    <div class="px-3">
+                        <dl class="dlist-align">
+                            <dt>Total price:</dt>
+                            <dd class="text-right">Rs {{ total }}</dd>
+                        </dl>
+                        <dl class="dlist-align">
+                            <dt>Tax:</dt>
+                            <dd class="text-right text-danger">Rs {{ tax }}</dd>
+                        </dl>
+                        <dl class="dlist-align">
+                            <dt>Grand Total:</dt>
+                            <dd class="text-right text-dark b"><strong> <span id="grand_total_checkout">Rs {{ grand_total }} </span> </strong></dd>
+                        </dl>
+                    </div>
                     <hr>
                     <p class="text-center mb-3">
                         <img src="{% static './images/misc/payments.png' %}" height="26">

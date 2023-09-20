@@ -44,7 +44,8 @@ class Account(AbstractBaseUser):
     last_name = models.CharField(max_length=50)
     email = models.EmailField(max_length=100, unique=True)
     phone_number = models.CharField(max_length=50, unique=True)
-    
+    profile_pic = models.ImageField(upload_to='user/profile_pic/',null=True,blank=True)
+
     # required
     date_joined = models.DateTimeField(auto_now_add=True)
     last_login = models.DateTimeField(auto_now=True)
@@ -59,6 +60,9 @@ class Account(AbstractBaseUser):
     
     def __str__(self):
         return self.email
+    
+    def full_name(self):
+        return f'{self.first_name} {self.last_name}' 
     
     def has_perm(self, perm, obj = None):
         return self.is_superadmin

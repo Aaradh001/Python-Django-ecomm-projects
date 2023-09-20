@@ -38,12 +38,15 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'mathfilters',
+    'django.contrib.humanize',
     'accounts',
     'admin_control',
     'category_management',
     'store',
     'carts',
     'orders',
+    'wallet_management',
+    'coupon_management',
 ]
 
 MIDDLEWARE = [
@@ -72,6 +75,7 @@ TEMPLATES = [
                 'category_management.context_processors.menu_links',
                 'accounts.context_processors.menu_links',
                 'carts.context_processors.counter',
+                'wallet_management.context_processors.wallet_balance',
             ],
         },
     },
@@ -145,7 +149,30 @@ STATICFILES_DIRS = [
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
+
+from django.contrib.messages import constants as messages
+MESSAGE_TAGS = {
+    messages.ERROR  : 'danger',
+}
+
+# SMTP configuration
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'testmydjangoplease@gmail.com'
+EMAIL_HOST_PASSWORD = 'tzhirmkbfpgramxz'
+
+
+
+
+#For To Enable Popus in Django or else it will block the payment popup
+SECURE_CROSS_ORIGIN_OPENER_POLICY = "same-origin-allow-popups"
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+

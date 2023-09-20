@@ -1,0 +1,262 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+{% include 'includes/header.html' %}
+
+<section class="section-conten padding-y bg">
+
+    <div class="container">
+        <div class="row">
+        <aside class="col-md-3 col-sm-3">
+            <!--   SIDEBAR   -->
+            <ul class="list-group">
+                <a class="list-group-item {% if '/myaccount' in request.path %} active {% endif %}" href="{% url 'user_account' %}">Profile</a>
+                <a class="list-group-item {% if '/order-history' in request.path %} active {% endif %}" href="{% url 'order_history' %}">Order history</a>
+                <a class="list-group-item {% if '/myaddress' in request.path %} active {% endif %}" href="{% url 'my_address'%}">Addresses</a>
+                <a class="list-group-item {% if '/wishlist' in request.path %} active {% endif %}" href="#">Wishlist</a>
+            </ul>
+            <br>
+            <a class="btn btn-light btn-block" href="{% url 'signout' %}"> <i class="fa fa-power-off"></i> <span class="text">Log out</span> </a> 
+            <!--   SIDEBAR .//END   -->
+        </aside>
+        {% block inner_content %}
+        <main class="col-md-9 col-sm-9">
+            <article class="card">
+                <header class="card-header">
+                    <div class="col-12 d-flex justify-content-between">
+                        <span><strong class="d-inline-block mr-3">Welcome Back ! </strong></span>
+                        <span><strong class="d-inline-block mr-3">{{user.full_name}}</strong></span>
+                    </div>
+                   {% include 'includes/alerts.html' %}
+                </header>
+                <div class="card-body">
+                    <div class="row"> 
+                        <!-- <div class="col-6"> -->
+                        <div class="col-xl-4 col-md-6 col-sm-12 mt-3 justify-content-center">
+                            <!-- <div class="aside"> -->
+                                <div class="d-flex justify-content-center">
+                                    {% if request.user.profile_pic %}
+                                        <img src="{{request.user.profile_pic.url}}" class="rounded-circle" style="max-width: 200px;" alt="Avatar" />
+                                    {% else %}
+                                        <img src="{% static 'store/images/icons/userprofile.svg' %}" class="rounded-circle" style="max-width: 120px;" alt="Avatar" />
+                                    {% endif %}
+                                </div>
+
+                                <div>
+                                    <form method="POST" enctype="multipart/form-data" action="{% url 'update_profile_picture' %}" >
+                                        {% csrf_token %}
+                                        
+                                            <div class="d-flex flex-column align-items-center px-5">
+                                                <!-- <input required type="file" class="custom-file-input" id="id_profile_pic" name="profile_pic"> -->
+                                                <label for="file-upload" class="mt-xl-5 w-100 custom-image-input">Select File</label>
+                                                <input id="file-upload" type="file" name="profile_pic" style="display: none;">
+                                                <button type="submit" class="btn btn-outline-primary w-100 mt-3">
+                                                    Update image
+                                                </button>
+                                            </div>
+                                        
+                                    </form>
+                                </div>
+                        </div>
+                        <!-- </div> -->
+                        <div class="col-xl-8 col-md-6 col-sm-12 mb-5">
+                            <div class="row">
+            
+                                <div class="col-xl-6 col-md-12 col-12"> 
+                                    <label for=""> <small> First Name</small></label>
+                                    <div class="input-group mb-3">
+                                        <input type="text" id="userProfileField1" name="first_name" onchange="UpdateFieldUserProfile(this)" class="form-control" placeholder="First Name" value="{{user.first_name}}" readonly  aria-describedby="button-addon2">
+                                        <button class="btn btn-outline-dark" type="button" id="button-addon2" onclick="editFieldUserProfile('1')">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil" viewBox="0 0 16 16">
+                                                <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z"/>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-xl-6 col-md-12  col-12"> 
+                                    <label for=""> <small> Last Name</small></label>
+                                    <div class="input-group mb-3">
+                                        <input type="text" id="userProfileField2" name="last_name" onchange="UpdateFieldUserProfile(this)" class="form-control" placeholder="Last Name" value="{{user.last_name}}"  readonly aria-describedby="button-addon2">
+                                        <button class="btn btn-outline-dark" type="button" id="button-addon2" onclick="editFieldUserProfile('2')">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil" viewBox="0 0 16 16">
+                                                <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z"/>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div class="mt-4 col-xl-6 col-md-12 col-12"> 
+                                    <label for=""> <small>Mobile Number</small></label>
+                                    <div class="input-group mb-3">
+                                        <input type="text" id="userProfileField3" class="form-control" placeholder="First Name" value="{{user.phone_number}}"  readonly aria-describedby="button-addon2">
+                                        <button class="btn btn-outline-dark" type="button" id="button-addon2" data-toggle="modal" data-target="#mobileChangeModal">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil" viewBox="0 0 16 16">
+                                                <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z"/>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="mt-4 col-xl-12 col-md-12 col-12"> 
+                                    <label for=""> <small>Email Adress</small></label>
+                                    <div class="input-group mb-3">
+                                        <input type="email" id="userProfileField4" class="form-control" placeholder="Last Name" value="{{user.email}}"  readonly aria-describedby="button-addon2">
+                                        <button class="btn btn-outline-dark" type="button" id="button-addon2" data-toggle="modal" data-target="#emailChangeModal" >
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil" viewBox="0 0 16 16">
+                                                <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z"/>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div class="mt-4 col-xl-12 col-md-12 col-12">
+                                    <label for=""> <small>Password</small></label> 
+                                    <div class="input-group ">
+                                        <input type="password" id="userProfileField5" class="form-control" placeholder="password" value="********"  readonly aria-describedby="button-addon2">
+                                        <button class="btn btn-outline-dark" type="button" id="button-addon2" data-toggle="modal" data-target="#changePasswordModal">
+                                        Change Password
+                                        </button>
+                                    </div>
+                                    <!-- <a class="m-0 p-0 small text-decoration-none " href="#" data-toggle="modal" data-target="#resetPasswordModal">Reset Password Here</a>  -->
+            
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </article> <!-- order-group.// --> 
+        </main>
+    </div> <!-- row.// -->
+    {% endblock %}
+    </div> <!-- card-body .// -->
+    <!-- row.// -->
+</section>
+
+<!-- Modal Phone Change-->
+<div class="modal fade" id="mobileChangeModal" tabindex="-1" role="dialog" aria-labelledby="mobileChangeModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+    <div class="modal-content">
+        <div class="modal-header">
+        <h5 class="modal-title" id="mobileChangeModalLabel">Mobile Number Change</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+        </div>
+        <div class="modal-body">
+
+            <p>
+                You are going to change mobile Number, for that you will recieve an otp at your registered phone number.                               new phone number
+            </p>
+
+            <label for="sendMobileChangeOtpMobNewMob" class="mt-2"> <small>New Mobile Number</small></label> 
+            <input type="number" id="sendMobileChangeOtpMobNewMob"  class="form-control " placeholder="New Mobile Number" value="" >
+            <p class="text-danger small m-0 p-0" id="sendMobileChangeOtpMobNewMobError"></p>
+            
+            
+            <a class="btn btn-dark mt-2" onclick="sendMobChangeOtp()" id="sendMobileChangeOtpMobNewMobCnfBTn">
+                <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                Confirm
+            </a>
+
+            <div id="sendMobileChangeOtpMobNewMobOtpDiv" class="d-none">
+                
+                <label for="" class="mt-2"> <small>Enter Otp</small></label> 
+                    <input type="number" id="sendMobileChangeOtpMobNewMobOtp"   class="form-control " placeholder="OTP" value="" >
+                    <p class="text-danger small m-0 p-0" id="sendMobileChangeOtpMobNewMobOtpError"></p>
+                <button class="btn btn-dark mt-2" onclick="sendMobChangeOtpVerify()">
+                    Change
+                </button>
+            </div>
+            
+        </div>
+        <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="location.reload();">Close</button>
+        </div>
+    </div>
+    </div>
+</div>
+<!-- #Modal phone number change end -->
+
+
+<!-- Modal Email Change-->
+<div class="modal fade" id="emailChangeModal" tabindex="-1" role="dialog" aria-labelledby="emailChangeModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+    <div class="modal-content">
+        <div class="modal-header">
+        <h5 class="modal-title" id="emailChangeModalLabel">Email Address Change</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+        </div>
+        <div class="modal-body">
+
+            <p>You are going to change email address , for that you will get a otp in your
+                new email id
+            </p>
+
+            <label for="" class="mt-2"> <small>New Email Id</small></label> 
+            <input type="email" id="sendEmailChangeOtpMailNewMail"  class="form-control " placeholder="New Email Address" value="" >
+            <p class="text-danger small m-0 p-0" id="sendEmailChangeOtpMailNewMailError"></p>
+            
+            
+            <a class="btn btn-dark mt-2" onclick="sendEmailChangeOtpMail()" id="sendEmailChangeOtpMailNewMailCnfBTn">
+                <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                Confirm
+            </a>
+
+            <div id="sendEmailChangeOtpMailNewMailOtpDiv" class="d-none">
+                
+                <label for="" class="mt-2"> <small>Enter Otp</small></label> 
+                    <input type="number" id="sendEmailChangeOtpMailNewMailOtp"   class="form-control " placeholder="OTP" value="" >
+                    <p class="text-danger small m-0 p-0" id="sendEmailChangeOtpMailNewMailOtpError"></p>
+                <button class="btn btn-dark mt-2" onclick="sendEmailChangeOtpMailVerify()">
+                    Change
+                </button>
+            </div>
+            
+        </div>
+        <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="location.reload();">Close</button>
+        </div>
+    </div>
+    </div>
+</div>
+<!-- end email change modal -->
+
+
+<!-- Modal Change password-->
+<div class="modal fade" id="changePasswordModal" tabindex="-1" role="dialog" aria-labelledby="changePasswordModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+    <div class="modal-content">
+        <div class="modal-header">
+        <h5 class="modal-title" id="changePasswordModalLabel">Change Password</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+        </div>
+        <div class="modal-body">
+
+            <label for="" class="mt-2"> <small>Old Password</small></label> 
+            <input type="password" id="userProfileFieldOldPassword" class="form-control " placeholder="Old Password" value="" >
+            <p class="text-danger small m-0 p-0" id="userProfileFieldOldPasswordError"></p>
+            
+            <label for="" class="mt-2"> <small>New Password</small></label> 
+            <input type="password" id="userProfileFieldNewPassword1" class="form-control " placeholder="New Password" value="" >
+            <p class="text-danger small m-0 p-0" id="userProfileFieldNewPassword1Error"></p>
+            
+            <label for="" class="mt-2"> <small>Confirm Password</small></label> 
+            <input type="password" id="userProfileFieldNewPassword2" class="form-control " placeholder="Confrim Password" value="" >
+            <p class="text-danger small m-0 p-0" id="userProfileFieldNewPassword2Error"></p>
+            
+        </div>
+        <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="location.reload();">Close</button>
+        <button type="button" class="btn btn-dark" onclick="UpdateFieldUserProfilePassword('userProfileFieldOldPassword','userProfileFieldNewPassword1','userProfileFieldNewPassword2')">Update Password</button>
+    
+        </div>
+    </div>
+    </div>
+</div>
+<!-- password change with old password modal -->
+{% endblock %}

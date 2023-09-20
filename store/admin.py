@@ -6,6 +6,5 @@ class ProductAdmin(admin.ModelAdmin):
     prepopulated_fields = {'prod_slug': ('product_name',)}
     
 
-
 admin.site.register(Product, ProductAdmin)
 admin.site.register(ProductImage)

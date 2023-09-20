@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% load static %}
+ 
+{% block content %}
+
+<div class="containerjustify-content-center " style="margin-top: 20px;">
+    <center>
+        <img style="width: 100px; margin-bottom: 20px;" src="{% static './images/icons/delete.png' %}" alt="">
+        <!-- <i class="fas fa-check-circle" style="font-size: 72px;margin-bottom: 20px;color: #e32e06;"></i> -->
+    </center>
+    <h2 class="text-center mb-3">Sorry ! Order Not Placed ! </h2>
+    <div class="d-flex justify-content-center">
+        <div>
+            
+            <img src="{% static './images/icons/failed-order.png' %}" style="max-width: 300px;" alt="order not placed" >
+        </div>
+        
+    </div>
+    
+        {% if messages %}
+        {% for message in messages %}
+        <p class="text-center">{{message}}</p>
+    
+        {% endfor %}
+        {% endif %}
+
+        <h5 class="text-center mt-5">
+            {{error_description}} <br>
+            <a href="{% url 'checkout' %}" >Retry Payment !</a>
+        </h5>
+        
+
+</div>
+
+
+
+
+
+{% endblock %}

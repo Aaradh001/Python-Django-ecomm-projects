@@ -1,0 +1,82 @@
+{% extends 'user_account.html' %}
+{% load static %}
+
+{% block inner_content %}
+
+    
+    <main class="col-md-9">
+        <article class="card">
+            <header class="card-header">
+                <strong class="d-inline-block mr-3">Order ID: {{order.order_number}}</strong>
+                <span>Order Date: {{order.created_at}}</span><br>
+
+                {% if order.order_status == 'Cancelled by User' or order.order_status == 'Returned' or order.order_status == 'Cancelled by Admin' %}
+                    <strong class="d-inline-block mr-3">Order status: <span class="text-danger">{{order.order_status}}</span></strong>
+                {% else %}
+                    <strong class="d-inline-block mr-3">Order status: <span class="text-success">{{order.order_status}}</span></strong>
+                {% endif %}
+            </header>
+            <div class="card-body">
+                <div class="row"> 
+                    <div class="col-md-8">
+                        <h6 class="text-muted">Delivery to</h6>
+                        <p>Name: {{order.shipping_address.name}}<br> 
+                        Phone: {{order.shipping_address.phone}}<br>
+                        Address: {{order.shipping_address.address_line_1}}, <br>
+                        {{order.shipping_address.address_line_2}},<br>
+                        PIN: {{order.shipping_address.pincode}}, {{order.shipping_address.city}},<br>
+                        {{order.shipping_address.state}}, {{order.shipping_address.country}}
+                         </p>
+                    </div>
+                    <div class="col-md-4">
+                        <h6 class="text-muted">Payment</h6>
+                        <span class="text-success">
+                            <i class="fas fa-shipping-fast"></i>
+                            {{payment.payment_method}} 
+                        </span><br>
+                        <span class="text-success">
+                            {{payment.payment_id}} 
+                        </span>
+                        <p>Order total: &#8377; {{sub_total}}<br>
+                         Tax: &#8377; {{tax}}<br> 
+                         <span class="b">Total: &#8377; {{grand_total}} </span><br>
+                         <span class="text-success">Wallet discount: &#8377; {{order.wallet_discount}}</span><br>
+                         
+                         <span class="b">Grand total: &#8377; {{order.order_total}} </span><br>
+                        </p>
+                    </div>
+                </div> <!-- row.// -->
+            </div> <!-- card-body .// -->
+
+            <div class="table-responsive">
+            <table class="table table-hover">
+                {% for order_product in order_products %}
+                <tr>
+                    <td width="65">
+                        <img src="{{order_product.product.images.url}}" class="img-xs border">
+                    </td>
+                    <td> 
+                        <p class="title mb-0">{{order_product.product.product_name}}</p>
+                        <var class="price text-muted">&#8377; {{order_product.product_price}}</var>
+                    </td>
+                    <td> Brand <br> {{order_product.product.brand}} </td>
+                    <td> Type <br> {{order_product.product.category.category_name}} </td>
+                </tr>
+                {% endfor %}
+            </table>
+            </div> <!-- table-responsive .end// -->
+
+            {% if order.order_status == 'New' or order.order_status == 'Accepted' %}
+            <a href="{% url 'order_cancel_user' order.order_number %}" class="btn btn-outline-danger my-2 mx-2">
+                Cancel Order
+            </a>
+            {% elif  order.order_status == 'Delivered' %}
+            <a href="{% url 'order_return_user' order.order_number %}" class="btn btn-outline-danger my-2 mx-2">
+                Return Order
+            </a>
+            {% endif %}
+
+
+        </article> <!-- order-group.// --> 
+    </main>
+{% endblock %}

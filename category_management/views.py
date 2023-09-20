@@ -8,5 +8,4 @@ def category_listing(request,):
     context = {
         'categories': categories,
         }
-    
-    return render(request, 'all_product_display.html',context)
+    return render(request, 'all_product_display.html', context)

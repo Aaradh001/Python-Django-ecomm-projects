@@ -37,3 +37,10 @@ class AddressBookForm(forms.ModelForm):
     class Meta:
         model = AddressBook
         exclude = ('user','is_default','is_active')
+
+
+
+class UserProfilePicForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ['profile_pic']

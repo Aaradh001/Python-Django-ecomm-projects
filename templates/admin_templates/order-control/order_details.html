@@ -1,0 +1,131 @@
+{% extends 'admin_templates/base_admin.html' %}
+{% load static %}
+
+{% block content %}
+
+<div class="container">
+    {% if messages %}
+    {% for message in messages %}
+    <div
+      class="alert alert-dismissible fade show {% if message.tags == 'error' %} alert-danger {% else %} alert-dark {% endif %}"
+      role="alert">
+      <strong>{{message.tags|title}} !</strong> {{message}}
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+
+    {% endfor %}
+
+    {% endif %}
+    
+</div>
+
+
+<!-- ========================= SECTION CONTENT ========================= -->
+<section class="section-conten padding-y bg">
+
+  <div class="container">
+      <div class="row">
+      
+      <main class="col-md-12">
+          <article class="card">
+          <header class="card-header">
+              <strong class="d-inline-block mr-3">Order ID: {{order.order_number}}</strong>
+              <span>, {{order.created_at}}</span>
+              <br>
+              <span>Order Status :
+                <div class="col-md-4">
+                  <div class="form-group">
+                  <select name="order_status" class="form-select cursor-pointer" onchange="showSelectedOption(this,'{{order.order_number}}')">
+                    {% for value, label in form.fields.order_status.choices %}
+                        <option value="{{ value }}" {% if form.instance.order_status == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+                </div>  
+              </div>
+              </span>
+          </header>
+          <div class="card-body">
+              <div class="row"> 
+                  <div class="col-md-8">
+                      <h6 class="text-muted">Delivery to</h6>
+                        <p>{{order.shipping_address.name}} <br>  
+                        Phone : {{order.shipping_address.phone}} <br>
+                        Location: {{order.shipping_address.address_line_1}}, {{order.shipping_address.address_line_2}}, {{order.shipping_address.city}},  {{order.shipping_address.state}}, {{order.shipping_address.country}} <br> 
+                        Pincode : {{order.shipping_address.pincode}}
+                        </p>
+                  </div>
+                  <div class="col-md-4">
+                      <h6 class="text-muted">Payment</h6>
+                      <span class="text-success">
+                          <i class="fab fa-lg fa-cc-visa"></i>
+                         
+                         ID: {{payment.payment_id}} <br>
+                         Method : {{payment.payment_method}}<br> 
+                         Status :{{payment.payment_status}} ({{payment.created_at}})
+                      </span>
+                      <hr>
+                      <dl class="dlist-align m-0 d-flex justify-content-between">
+                          <dt>Total price:</dt>
+                          <dd class="text-right ms-5 ps-5">&#8377;{{total}}</dd>
+                      </dl>
+                      <dl class="dlist-align m-0 d-flex justify-content-between">
+                          <dt>Tax:</dt>
+                          <dd class="text-right text-danger ms-5 ps-5"> &#8377;{{order.tax}}</dd>
+                      </dl>
+                      <dl class="dlist-align m-0 d-flex justify-content-between">
+                          <dt>Coupon Discount:</dt>
+                          <dd class="text-right text-success ms-5 ps-5">&#8377;{{order.additional_discount}}</dd>
+                      </dl>
+                      <dl class="dlist-align m-0 d-flex justify-content-between">
+                          <dt>Wallet Discount:</dt>
+                          <dd class="text-right text-success ms-5 ps-5">&#8377;{{order.wallet_discount}}</dd>
+                      </dl>
+                      <hr>
+                      <dl class="dlist-align d-flex justify-content-between">
+                          <dt>Payable amount:</dt>
+                          <dd class="text-right text-dark ms-5 ps-5"><strong>&#8377;{{order.order_total}}</strong></dd>
+                      </dl>
+                  </div>
+              </div> <!-- row.// -->
+          </div> <!-- card-body .// -->
+          <div class="table-responsive">
+          <table class="table table-style-admin table-hover">
+              {% for order_product in order_products%}
+                <tr>
+                  <td width="65">
+  
+                      <img src="{{order_product.product.images.url}}" style="max-width: 100px;" class="img-xs border">
+                  </td>
+
+                  <td> 
+                        <p class="title mb-0">
+                         
+                            {{order_product.product.brand}}
+                            {{order_product.product.product_name}}
+                            
+                            <br>
+                            Category: {{order_product.product.category.category_name}}
+                        </p>
+                  </td>
+                  <td> Quantity <br> {{order_product.quantity}} </td>
+                  <td> Each Price <br>Rs {{order_product.product_price}}
+                    <!-- <br> -->
+                  <!-- <small> <del> Rs max price </del></small> -->
+                 </td>
+                </tr>
+              {% endfor %}
+          </table>
+          
+          </div> <!-- table-responsive .end// -->
+          </article> <!-- order-group.// --> 
+      </main>
+  </div> <!-- row.// -->
+  </div>
+  
+  
+  </section>
+
+  
+
+
+  {% endblock %}

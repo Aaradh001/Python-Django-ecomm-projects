@@ -6,7 +6,7 @@
 <div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full"
     data-sidebar-position="fixed" data-header-position="fixed">
     <!-- Sidebar Start -->
-    <aside class="left-sidebar">
+    <aside class="left-sidebar side-bar-style">
       <!-- Sidebar scroll-->
       <div>
         <div class="brand-logo d-flex align-items-center justify-content-between">
@@ -63,18 +63,16 @@
               <span class="hide-menu">Category Management</span>
             </li>
             
-            <li class="sidebar-item">
+            <li class="sidebar-item dropdown">
               
-              <div class="sidebar-link">
+              <div class="sidebar-link text-light ` bg-dark cursor-pointer ">
                 <i class="ti ti-file-description"></i>
-                <span class="hide-menu">All category 
-                </span>
-                <div class="dropdown">
-                  <a class="btn btn-secondary dropdown-toggle" data-bs-auto-close="outside"
-                  type="button" data-bs-toggle="dropdown" aria-expanded="false"></a>
+                <span class="hide-menu dropdown-toggle" data-bs-auto-close="outside" data-bs-toggle="dropdown" aria-expanded="false" >All category </span>
                   <ul class="dropdown-menu">
-                    {% for category in links %}
+                    {% for category in all_categories_list %}
                     {% if not category.parent %}
+                   
+
                     <li class="dropdown d-flex justify-content-between align-items-center">
                       <a href="{% url 'edit_category' category.cat_slug %}"><img class="ms-2" src="{% static './images/extras/pencil-square.svg' %}" alt="edit"></a>
                       <a class="dropdown-item cat-dropdown dropdown-toggle" data-bs-toggle="dropdown" href="#">{{category}}</a>
@@ -83,13 +81,14 @@
                           <div class="button-random r-random" id="button-1-random">
                             <input  {% if category.is_valid %} checked {% endif %}
                              type="checkbox" id="on_off_id" name="on_off" class="checkbox-random" value="{{category.cat_slug}}"/>
-                            <div class="knobs-random"></div>
-                          </div>
+                             <div class="knobs-random"></div>
+                            </div>
                         </div>
                         <!-- </form> -->
                       
                       <ul class="dropdown-menu category-dropdown">
-                        {% for subcategory in links %}
+                        
+                        {% for subcategory in all_categories_list %}
                         {% if subcategory.parent == category %}
                         <li class="d-flex justify-between align-items-center">
                           
@@ -100,7 +99,7 @@
                                 <div class="knobs-random"></div>
                               </div>
                           </div>
-
+                          
                           <a href="{% url 'edit_category' subcategory.cat_slug %}"><img class="me-2" src="{% static './images/extras/pencil-square.svg' %}" alt="edit"></a>
                           
                           <a href="" class="dropdown-item inside-cat-dropdown">{{subcategory.category_name}}</a>
@@ -111,12 +110,10 @@
                     </li>
                     {% endif %}
                     {% endfor %}
-
+                    
                   </ul>
-                </div>
               </div>
             </li>
-            <hr>
             <!-- <div class="filter-content collapse show" id="collapse_1" style="">
               <div class="card-body">
                 <ul class="list-menu">
@@ -124,7 +121,6 @@
               </div>
             </div> -->
             
-
             
             <li class="sidebar-item">
               <a class="sidebar-link" href="{% url 'add_category' %}" aria-expanded="false">
@@ -132,8 +128,45 @@
                 <span class="hide-menu">Add category</span>
               </a>
             </li>
+            <hr>
+            <li class="nav-small-cap">
+              <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
+              <span class="hide-menu">Order Management</span>
+            </li>
 
-          
+            <li class="sidebar-item dropdown ">
+              <div class="sidebar-link text-light bg-dark">
+                <i class="ti ti-file-description"></i>
+                <span class="hide-menu align-items-center dropdown-toggle" data-bs-auto-close="outside" type="button" data-bs-toggle="dropdown" aria-expanded="false">Order</span>
+                  <ul class="dropdown-menu">
+                    <li><a href="{% url 'all_orders_admin' %}" class="dropdown-item "><strong>All orders</strong></a></li>
+                    <li><a href="{% url 'all_orders_admin' %}?status=New" class="dropdown-item "><strong>New orders</strong></a></li>
+                    <li><a href="{% url 'all_orders_admin' %}?status=Cancelled" class="dropdown-item "><strong>Cancelled orders</strong></a></li>
+                  </ul>
+              </div>
+            </li>
+
+
+            <li class="nav-small-cap">
+              <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
+              <span class="hide-menu">Coupon Management</span>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link" href="{% url 'admin-all-coupon' %}" aria-expanded="false">
+                <span>
+                  <i class="ti ti-login"></i>
+                </span>
+                <span class="hide-menu">All Coupons</span>
+              </a>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link" href="{% url 'admin-coupon-create' %}" aria-expanded="false">
+                <span>
+                  <i class="ti ti-user-plus"></i>
+                </span>
+                <span class="hide-menu">Create Coupon</span>
+              </a>
+            </li>
             <li class="nav-small-cap">
               <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
               <span class="hide-menu">AUTH</span>
@@ -154,26 +187,8 @@
                 <span class="hide-menu">Register</span>
               </a>
             </li>
-            <li class="nav-small-cap">
-              <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
-              <span class="hide-menu">EXTRA</span>
-            </li>
-            <li class="sidebar-item">
-              <a class="sidebar-link" href="./icon-tabler.html" aria-expanded="false">
-                <span>
-                  <i class="ti ti-mood-happy"></i>
-                </span>
-                <span class="hide-menu">Icons</span>
-              </a>
-            </li>
-            <li class="sidebar-item">
-              <a class="sidebar-link" href="./sample-page.html" aria-expanded="false">
-                <span>
-                  <i class="ti ti-aperture"></i>
-                </span>
-                <span class="hide-menu">Sample Page</span>
-              </a>
-            </li>
+
+
           </ul>
         </nav>
         <!-- End Sidebar navigation -->
@@ -229,7 +244,7 @@
         </nav>
       </header>
       <!--  Header End -->
-      <div class="container-fluid">
+      <div class="container-fluid {% if 'coupon/create' in request.path %} coupon-bg {% endif %} ">
 
     {% block content %}
 
@@ -281,19 +296,5 @@
   });
 </script>
 
-
-
-
-
-
-
-<script src="https://code.jquery.com/jquery-3.7.0.js" integrity="sha256-JlqSTELeR4TLqP0OG9dxM7yDPqX1ox/HfgiSLBj8+kM=" crossorigin="anonymous"></script>
-<script src="{% static './libs/jquery/dist/jquery.min.js' %}"></script>
-<script src="{% static './libs/bootstrap/dist/js/bootstrap.bundle.min.js' %}"></script>
-<script src="{% static './js/sidebarmenu.js' %}"></script>
-<script src="{% static './js/app.min.js' %}"></script>
-<script src="{% static './libs/apexcharts/dist/apexcharts.min.js' %}"></script>
-<script src="{% static './libs/simplebar/dist/simplebar.js' %}"></script>
-<script src="{% static './js/dashboard.js' %}"></script>
 
 {% endblock %}

@@ -10,7 +10,18 @@
         <!-- ============================ COMPONENT 2 ================================= -->
         <div class="row">
             <main class="col-md-8">
-
+                
+                {% if messages %}
+                {% for message in messages %}
+                <div
+                  class="alert alert-dismissible fade show {% if message.tags == 'error' %} alert-danger {% else %} alert-dark {% endif %}"
+                  role="alert">
+                  <strong>{{message.tags|title}} !</strong> {{message}}
+                  <!-- <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button> -->
+                </div>
+            
+                {% endfor %}
+                {% endif %}
                 <article class="card mb-4">
                     <div class="card-body">
                         <h4 class="card-title mb-4">Review cart</h4>
@@ -60,10 +71,10 @@
                 <article class="card mb-4">
                     <div class="card-body">
                         <h4 class="card-title mb-4">Delivery info</h4>
-                                <div class="form-row row ">
-                                    <!-- need to align html -->
+                        <div class="form-row row ">
+                            <!-- need to align html -->
                                     <div class="form-group">
-                                        {{shipping_address.name}}
+                                        {{shipping_address.name}},
                                         {{shipping_address.phone}},<br>
                                         {{shipping_address.address_line_1}},
                                         {{shipping_address.address_line_2}},<br>
@@ -73,49 +84,150 @@
                                         {{shipping_address.pincode}},
                                     </div>
                                 </div>
-                    </div> <!-- card-body.// -->
-                </article> <!-- card.// -->
-
-                <form action="{% url 'order_complete' order.order_number %}" id="payment-form" method="post">
-                    {% csrf_token %}
-                    <input type="text" hidden value="{{order.order_number}}" id="order_number_order_summary" name="order_number_order_summary">
-                <article class="accordion" id="accordion_pay">
-                        <div class="card">
-                            {% for payment_method in payment_methods %}
-                            <header class="card-header">
-                                <label class="form-check collapsed" data-toggle="collapse" data-target="#pay_paynet">
-                                    <input class="form-check-input" name="payment_option" checked type="radio" value="{{payment_method.id}}">
-                                    <h6 class="form-check-label"> 
-                                        {{payment_method.method_name}} 
-                                    </h6>
-                                </label>
-                            </header>
-                            {% endfor %}
-                        </div>
-                </article> 
-            <!-- accordion end.// -->
+                            </div> <!-- card-body.// -->
+                        </article> <!-- card.// -->
+                        
                 
             </main> <!-- col.// -->
+
+
             <aside class="col-md-4">
-                <div class="card">
-                    <div class="card-body">
-                        <dl class="dlist-align">
-                            <dt>Total price:</dt>
-                            <dd class="text-right">&#8377;{{total}}</dd>
-                        </dl>
-                        <dl class="dlist-align">
-                            <dt>Tax:</dt>
-                            <dd class="text-right"> &#8377;{{tax}}</dd>
-                        </dl>
-                        <dl class="dlist-align">
-                            <dt>Grand Total:</dt>
-                            <dd class="text-right text-dark b"><strong>&#8377;{{grand_total}}</strong></dd>
-                        </dl>
-                        <hr>
-                        <p class="text-center mb-3">
+                <!-- <div class="card mb-4"> -->
+                <article class="accordion card mb-4" id="accordion_pay">
+                    <form action="{% url 'place_order' %}" id="payment-form" method="post">
+                        {% csrf_token %}
+                        <input type="text" hidden value="{{order.order_number}}" id="order_number_order_summary" name="order_number_order_summary">
+                        <div class="card-body">
+                            <h4 class="card-title mb-4">Payment Type</h4>
+                            <p class="text-danger" id="payment-method-error"></p>
+                            {% for payment_method in payment_methods %}
+                                {% if payment_method.method_name != 'WALLET' %}
+                                <header class="card-header border-0">
+                                    <label class="form-check">
+                                        <input class="form-check-input" id="id_payment_div_{{payment_method.method_name}}" name="payment_option" type="radio" value="{{payment_method.method_name}}">
+                                        <h6 class="form-check-label">
+                                            {{payment_method.method_name}}
+                                        </h6>
+                                    </label>
+                                </header>
+                                {% endif %}
+                            {% endfor %}
+                            <input hidden disabled checked type="radio" class="form-check-input" id="id_payment_div_WALLET" name="payment_option" value="WALLET">
+                            <!-- collapse .// -->
+                        </div> <!-- card.// -->
+                    </article> 
+
+                    <article class="card mb-4">
+                        <div class="card-body">
+                            <h4 class="card-title mb-4">Have a coupon?</h4>
+                            <span id="coupon-not-applied">
+                                <div class="row">
+                                    
+                                    <div class="col-8">
+                                        <input type="text" name="coupon_code" class="form-control" id="coupon_code">
+                                    </div>
+                                    <div class="col-4">
+                                        <button class="btn btn-primary" id="coupon_btn">Apply</button>
+                                    </div>
+                                    
+                                </div>
+                            </span>
+                            <div id="coupon-applied" class="d-none col my-2">
+                                <button id="coupon-applied-btn"  class="btn btn-success text-capitalize">
+                                    Coupon Value
+                                </button>
+                                <a href="" class="text-decoration-none text-danger" onClick="window.location.reload()">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-square" viewBox="0 0 20 20">
+                                    <path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"></path>
+                                    <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"></path>
+                                    </svg>
+                                </a>
+                                <small><p class="text-success mt-3" id="coupon-applied-description"></p> </small> 
+                            </div>
+                            <div class="col">
+                                <p id="couponError" class="text-danger my-2"></p>
+                                <a href="" data-toggle="modal" data-target="#couponsModal"><small>View All Coupons</small></a>
+                            </div>
+                        </div> <!-- card-body.// -->
+                    </article> <!-- card.// -->
+
+                    <!-- couponsModal -->
+                    <div class="modal fade" id="couponsModal" tabindex="-1" role="dialog" aria-labelledby="couponsModalLabel" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                            <h5 class="modal-title" id="couponsModalLabel">Coupons</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                            </div>
+                            <div class="modal-body">
+
+                                {% for coupon in coupons %}
+                                <div class="card my-1">
+                                    <div class="card-body">
+                                        <b>{{coupon.coupon_code}}</b>
+                                        {{coupon.description}}
+                                    </div>
+                                </div>
+                                    {% endfor %}
+                                
+                            </div>
+                            <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        
+                        
+                            </div>
+                        </div>
+                        </div>
+                    </div> <!-- end coupons Modal -->
+
+
+
+                    
+
+
+                    <div class="card">
+                        <div class="card-body">
+                            <dl class="dlist-align">
+                                <dt>Total price:</dt>
+                                <dd class="text-right">&#8377;{{total}}</dd>
+                            </dl>
+                            <dl class="dlist-align">
+                                <dt>Tax:</dt>
+                                <dd class="text-right"> &#8377;{{tax}}</dd>
+                            </dl>
+                            <dl class="dlist-align">
+                                <dt>Grand Total:</dt>
+                                <dd class="text-right text-dark b"><strong>&#8377;{{grand_total}}</strong></dd>
+                            </dl>
+                            <dl class="dlist-align">
+                                <dt>Coupon Discount:</dt>
+                                <dd class="text-right text-success" id="coupon_discount"><strong>&#8377;0</strong></dd>
+                            </dl>
+                            <hr>
+                            <dl class="dlist-align">
+                                <dt>Wallet : 
+                                      <img src="{% static './images/icons/gold-coin.svg' %}" alt="footer-payment" height="12">
+                                   <span id="wallet_updated_balance">
+                                    {{wallet_balance}}
+                                   </span> 
+                                </dt>
+                                <dd class="text-right">
+                                    <input type="checkbox" id="wallet_balance" name="wallet_balance" value="0" onclick="wallet_balance_add();"/>
+                                    Use Wallet
+                                </dd>
+                            </dl>
+                            <hr>
+                            <dl class="dlist-align mb-4">
+                                <dt>Payable amount:</dt>
+                                <dd class="text-right text-dark b" id="grand_total_update"><strong>&#8377;{{grand_total}}</strong></dd>
+                            </dl>
+                            <hr>
+                            <p class="text-center mb-3">
                             <img src="{% static './images/misc/payments.png' %}" height="26">
                         </p>
-                        <button type="submit" class="btn btn-primary btn-block"> Place Order </button>
+                        <button id="payment-form-btn" type="submit" class="btn btn-primary btn-block"> Proceed to payment </button>
                     </form>
                     </div> <!-- card-body.// -->
                 </div> <!-- card.// -->
@@ -133,7 +245,101 @@
 
 
 <!-- ========================= SECTION CONTENT END// ========================= -->
+<script>
+    var btn = $('#payment-form-btn');
+    btn.on('click', function(e){
+        try {
+            payment_method = document.querySelector('input[name="payment_option"]:checked').value;
+          }
+          catch(err) {
+            payment_method =''
+          }
+        
+        if (payment_method){
+            
+            console.log(payment_method)
+        }
+        else
+        {
+            e.preventDefault();
+            document.getElementById('payment-method-error').innerText='Choose A Payment Method First'
+        }
+        
+        
+    });
+    // setTimeout(function(){
+    //     $('#payment-method-error').fadeOut('slow')
+    // }, 3000)
+
+    var btn = $('#coupon_btn');
+    btn.on('click', function(e){
+        e.preventDefault();
+        document.getElementById('coupon-applied').classList.add('d-none')
+        document.getElementById('couponError').innerText=''
+        var coupon_code = $('#coupon_code').val();
+        if (!coupon_code){
+            document.getElementById('couponError').innerText = 'Enter a valid coupon code !'
+            return
+        }
+        var url = 'coupon/verify/'
+        // var is_wallet = document
+
+        var data = {
+            coupon_code : coupon_code,
+            order_number : '{{order.order_number}}'
+        };
+
+        $.ajax({
+            type: "POST",
+            url: url,  // Replace with the actual URL for your view
+            dataType: "json",
+            data: JSON.stringify(data),
+            headers: {
+                "X-Requested-With": "XMLHttpRequest",
+                "X-CSRFToken": getCookie("csrftoken"), 
+            },
+            success: (data) => {
+                if (data.status === "success") {
+                // email success
+                console.log(data);
+                if (document.getElementById('wallet_balance').checked){
+                    console.log("pressed")
+                    document.getElementById('wallet_balance').checked = false
+                    wallet_balance_add();
+                }
+                document.getElementById('coupon-applied').classList.remove('d-none')
+                document.getElementById('coupon-not-applied').classList.add('d-none')
+                document.getElementById('coupon-applied-description').innerText = data.message
+                document.getElementById('coupon-applied-btn').innerText = coupon_code
+
+                document.getElementById('coupon_discount').innerText = 'Rs'+ data.coupon_discount
+
+                var new_grand_total = data.grand_total
+                document.getElementById('grand_total_update').innerText = 'Rs'+ new_grand_total
+                
+
+            } else {
+                // Password change error
+                console.log(data);
+                document.getElementById('couponError').innerText = data.message
+                // Display the error message on the page
+            }
+                
+            },
+            error: (xhr, status, error) => {
+                // Display the error message on the page
+                console.log("error");
+                console.log(error);
+            }
+            });
+
+    });
 
 
+
+
+
+
+</script>
 
 {% endblock %}

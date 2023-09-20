@@ -107,3 +107,28 @@
   #button-1-random .layer-random {
     transition: 0.3s ease all;
   }
+
+  .side-bar-style{
+    background-color: rgb(241, 241, 241);
+  }
+  
+  .table-style-admin{
+    background-color: rgb(241, 241, 241);
+    font-size: 13px;
+    color: black;
+  }
+  .table-style-admin th{
+    font-weight: 700;
+  }
+  
+  .table-hover{
+    background-color: rgb(241, 241, 241);
+  }
+
+
+
+
+
+  .coupon-bg{
+    background-color: rgb(221, 238, 221);
+  }

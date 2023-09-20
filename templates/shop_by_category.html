@@ -1,0 +1,70 @@
+{% load static %}
+{% load humanize %}
+
+<div class="contianer bg-dark">
+    <div class="row p-0 justify-content-center mb-2 text-white">
+        <!-- <div class="d-flex justify-content-center mb-2 text-white"> -->
+            <div>
+                <h2 class="catg-heading-text py-4">
+                Shop by category
+               </h2> 
+            </div>
+        <!-- </div> -->
+    </div>
+
+    <div class="row p-0 m-0 d-flex justify-content-center bd-highlight text-white flex-wrap">
+        <!-- <div class="d-flex justify-content-center bd-highlight text-white flex-wrap"> -->
+            <div class="p-3 rounded-top bg-secondary">Recommended</div>
+
+            {% for category in all_categories_list|slice:":6" %}
+                {% if category.parent %}
+                  <div class="p-3 "><a href="{% url 'product_by_category' category.cat_slug %}" class="text-decoration-none text-white">
+                    {{category.category_name}}
+                  </a></div>  
+                {% endif %}
+            {% endfor %}
+            <div class="p-3 ">
+                <a href="{% url 'product_store' %}" class="text-decoration-none text-white"> All Categories</a>
+            </div>
+          
+
+          <!-- </div>  -->
+
+    </div>
+</div>
+<div class="container mt-4">
+    <div class="row">
+        {% for product in products %}
+
+        <div class="col-md-3">
+            <figure class="card card-product-grid">
+                <a href="{{product.get_url}}">
+                    <div class="img-wrap"> 
+                        <img src="{{product.images.url}}">
+                    </div> <!-- img-wrap.// -->
+                </a>
+                <figcaption class="info-wrap">
+                    <div class="fix-height">
+                        <a href="{{product.get_url}}" class="title">{{product.brand}} {{ product.product_name}} {{product.category}}</a>
+                        <div class="price-wrap mt-2">
+                            <span class="price">
+                                &#8377; {{product.price}}
+                            </span>
+                            <del class="price-old">&#8377; 9,999.00</del>
+                        </div> <!-- price-wrap.// -->
+                    </div>
+                    {% if product.stock <= 0 %}
+                    <h5 class="text text-danger">Out of stock</h5>
+                    {% else %}
+                    <a href="{% url 'add_cart' product.id %}" class="btn btn-primary"><span class="text">Add to cart</span> <i class="fas fa-shopping-cart"></i>  </a>
+                    {% endif %}
+                </figcaption>
+            </figure>
+        </div> <!-- col.// -->
+
+
+
+
+        {% endfor %}
+    </div> <!-- row.// -->
+</div>

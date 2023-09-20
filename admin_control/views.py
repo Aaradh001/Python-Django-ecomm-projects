@@ -14,11 +14,16 @@ import random
 from accounts.models import UserProfile
 from store.models import Product, ProductImage
 from accounts.otp_verification.helper import MessageHandler
-
+from coupon_management.models import Coupon
+from coupon_management.forms import CouponForm
 from django.http import HttpResponseBadRequest, JsonResponse
 import json
 
-# # Create your views here.
+# Order management
+from orders.models import Order, OrderProduct, Payment
+from orders.forms import ChangeOrderStatusForm
+
+# Create your views here.
 
 User = get_user_model()
 
@@ -115,23 +120,24 @@ def user_create(request):
             return render(request, 'admin_templates/create_user.html',context)
         
         if form.is_valid():
-            first_name          = form.cleaned_data['first_name']
-            last_name           = form.cleaned_data['last_name']
-            phone_number        = form.cleaned_data['phone_number']
-            email               = form.cleaned_data['email']
-            is_active           = form.cleaned_data['is_active']
-            is_superadmin       = form.cleaned_data['is_superadmin']
-            is_staff            = form.cleaned_data['is_staff']
+            first_name = form.cleaned_data['first_name']
+            last_name = form.cleaned_data['last_name']
+            phone_number = form.cleaned_data['phone_number']
+            email = form.cleaned_data['email']
+            is_active = form.cleaned_data['is_active']
+            is_superadmin = form.cleaned_data['is_superadmin']
+            is_staff = form.cleaned_data['is_staff']
+            phone_number = '+91' + phone_number
             
             user = User.objects.create(
-                first_name          = first_name,
-                last_name           = last_name,
-                email               = email,
-                phone_number        = phone_number,
-                password            = password,
-                is_active           = is_active,
-                is_superadmin       = is_superadmin,
-                is_staff            = is_staff
+                first_name = first_name,
+                last_name = last_name,
+                email = email,
+                phone_number = phone_number,
+                password = password,
+                is_active = is_active,
+                is_superadmin = is_superadmin,
+                is_staff = is_staff
                 )
             
             UserProfile.objects.create(user = user)
@@ -142,15 +148,12 @@ def user_create(request):
                 'form': form
             }
             return render(request, 'admin_templates/create_user.html',context)
-            
     else:
         form = UserRegistrationForm()
         context = {
-            'form' : form,
+            'form': form,
         }
     return render(request, 'admin_templates/create_user.html', context)
-
-
 
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
@@ -159,10 +162,9 @@ def admin_signin(request):
         return redirect('admin-home')
     
     if request.method == 'POST':
-        raw_email   = request.POST.get("email")
-        password    = request.POST.get("password")
-
-        email       = raw_email.lower().strip()
+        raw_email = request.POST.get("email")
+        password = request.POST.get("password")
+        email = raw_email.lower().strip()
 
         check_if_user_exists = User.objects.filter(email=email).exists()
         if not check_if_user_exists:
@@ -171,19 +173,17 @@ def admin_signin(request):
         user = authenticate(email=email, password=password)
         
         if user is not None:
-            
             login(request, user)
             newuser = User.objects.get(email = email)
+            
             if newuser.is_staff and newuser.is_superadmin:
                 return redirect('admin-home')
             messages.error(request, "Sorry, you don't have admin privilages!")
-            
         else:
             messages.error(request, "Invalid password")
             return redirect('admin_signin')
         
     return render(request, 'admin_templates/admin_signin.html')
-
 
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
@@ -193,16 +193,16 @@ def admin_otp_generation(request):
         return redirect('admin-home')
     
     if request.method == 'POST':
-        phone_number        = request.POST.get('phone_number')
-        phone_number        = '+91'+phone_number
-        user = User.objects.filter(phone_number=phone_number).first()
+        phone_number = request.POST.get('phone_number')
+        phone_number = '+91'+ phone_number
+        user = User.objects.filter(phone_number = phone_number).first()
         if not user:
             # error messsage here
             messages.error(request, "Invalid phone number")
             return redirect('admin_otp_login')
         profile = UserProfile.objects.get(user = user)
         new_otp = random.randint(100000,999999)
-        profile.otp     = new_otp
+        profile.otp = new_otp
         profile.save()
         message_handler = MessageHandler(phone_number, profile.otp)
         message_handler.send_otp_to_phone()
@@ -212,10 +212,8 @@ def admin_otp_generation(request):
 
 
 def enter_otp(request, uid):
-    
     if request.user.is_authenticated and request.user.is_superadmin:
         return redirect('admin-home')
-    
     
     if request.method == 'POST':
         otp = request.POST.get('otp')
@@ -237,7 +235,6 @@ def enter_otp(request, uid):
     return render(request, 'admin_templates/enter_otp.html')
 
 
-   
 def block_or_unblock(request, id):
     user = User.objects.get(id=id)
     user.is_active = not user.is_active
@@ -246,69 +243,64 @@ def block_or_unblock(request, id):
     return redirect('user_management')
 
 
-
 def admin_signout(request):
     logout(request)
     return redirect('admin_signin')
-
 
 # <-------------------------------------product control-------------------------------------->
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @check_isadmin
 def product_listing(request):
-    # if not request.user.is_superuser or not request.user.is_staff:
-    #     return redirect('user_home')
+
     if not ( request.user.is_authenticated and request.user.is_superadmin):
         return redirect('admin_signin')
         
-    products    = Product.objects.all()
-    context     = {'products': products}
+    products = Product.objects.all()
+    context = {'products': products}
     return render(request, 'admin_templates/product_control/product_listing.html', context)
 
 
 @check_isadmin
 def product_control(request, id):
     product = Product.objects.get(id=id)
-    product.is_available    = not product.is_available
+    product.is_available = not product.is_available
     product.save()
     return redirect('products')
-
 
 
 # @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @check_isadmin
 def add_product(request):
-
     form = ProductCreationForm()
-    
+
     if request.method == 'POST':
         form = ProductCreationForm(request.POST, request.FILES)
         
         if form.is_valid():
-            product_name           = form.cleaned_data['product_name']
-            brand                  = form.cleaned_data['brand']
-            description            = form.cleaned_data['description']
-            price                  = form.cleaned_data['price']
-            images                 = form.cleaned_data['images']
-            stock                  = form.cleaned_data['stock']
-            category               = form.cleaned_data['category']
-            is_available           = form.cleaned_data['is_available']
+            product_name = form.cleaned_data['product_name']
+            brand = form.cleaned_data['brand']
+            description = form.cleaned_data['description']
+            price = form.cleaned_data['price']
+            images = form.cleaned_data['images']
+            stock = form.cleaned_data['stock']
+            category = form.cleaned_data['category']
+            is_available = form.cleaned_data['is_available']
             
             product = Product.objects.create(
-                product_name     = product_name,
-                brand            = brand,
-                description      = description,
-                price            = price,
-                images           = images,
-                stock            = stock,
-                category         = category,
-                is_available     = is_available
+                product_name = product_name,
+                brand = brand,
+                description = description,
+                price = price,
+                images = images,
+                stock = stock,
+                category = category,
+                is_available = is_available,
                 )
             
             input_images = []
             for i in range(1,5):
-                image = request.FILES['add_image'+str(i)]
+                image = request.FILES['add_image' + str(i)]
                 if image:
                     input_images.append(image)
             
@@ -323,10 +315,9 @@ def add_product(request):
             return redirect('products')    
         else:
             context = {
-                'form': form
+                'form': form,
             }
-            return render(request, 'admin_templates/product_control/product_add.html',context)
-            
+            return render(request, 'admin_templates/product_control/product_add.html', context)
     else:
         context = {
             'form' : form,
@@ -338,22 +329,21 @@ def add_product(request):
 @check_isadmin
 def product_update(request, id):
 
-    product      = Product.objects.get(id=id)
-    prod_images  = ProductImage.objects.filter(product=product)
-    form         = ProductCreationForm(instance = product)
+    product = Product.objects.get(id=id)
+    prod_images = ProductImage.objects.filter(product=product)
+    form = ProductCreationForm(instance = product)
 
     if request.method == 'POST':
         form = ProductCreationForm(request.POST, request.FILES, instance=product)
         if form.is_valid():
-            product                 = form.save(commit=False)
-            product.is_available    = form.cleaned_data['is_available']
+            product = form.save(commit=False)
+            product.is_available = form.cleaned_data['is_available']
             form.save()
-            print(product.stock)
             input_images = []
             for i in range(1,5):
                 try:
                     image = request.FILES['add_image'+str(i)]
-                    image_value = request.POST.get('product-image'+str(i), "")
+                    image_value = request.POST.get('product-image' + str(i), "")
                     print(image_value)
                     input_images.append([image, image_value])
                 except:
@@ -373,12 +363,13 @@ def product_update(request, id):
             print(form.errors)
             return render(request, 'admin_templates/product_control/product_edit.html', {'form': form, 'id': id})
     
-    context = {'form'           : form, 
-               'id'             : id,
-               'range'          : range(5),
-               'product'        : product,
-               'prod_images'    : prod_images
-               }
+    context = {
+        'form': form, 
+        'id': id,
+        'range': range(5),
+        'product': product,
+        'prod_images': prod_images,
+        }
     return render(request, 'admin_templates/product_control/product_edit.html', context)
     
     
@@ -389,7 +380,6 @@ def product_update(request, id):
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @check_isadmin
 def add_category(request):
-
     form = CategoryForm()
 
     if request.method == 'POST':
@@ -403,26 +393,21 @@ def add_category(request):
             context = {
                 'form': form
             }
-            
             return render(request, 'admin_templates/category-control/add_category.html',context)
-            
     else:
         form = CategoryForm()
         context = {
-            'form' : form,
+            'form': form,
         }
     return render(request, 'admin_templates/category-control/add_category.html', context)
-
-
 
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @check_isadmin
 def edit_category(request, cat_slug):
     
-    
-    category     = Category.objects.get(cat_slug = cat_slug)
-    form         = CategoryForm(instance = category)
+    category = Category.objects.get(cat_slug = cat_slug)
+    form = CategoryForm(instance = category)
     
     if request.method == 'POST':    
         form = CategoryForm(request.POST, instance=category)
@@ -436,11 +421,9 @@ def edit_category(request, cat_slug):
             return render(request, 'admin_templates/category-control/edit_category.html', {'form': form})
 
     context = {
-        'form' : form
+        'form': form
         }
     return render(request, 'admin_templates/category-control/edit_category.html', context)
-
-
 
 
 @check_isadmin
@@ -450,22 +433,124 @@ def category_control(request):
         if request.method == 'POST':    
             data = json.load(request)
             cat_slug = data.get('checkboxValue')
-            category =  Category.objects.get(cat_slug = cat_slug)
-            category.is_valid    = not category.is_valid
+            category = Category.objects.get(cat_slug = cat_slug)
+            category.is_valid = not category.is_valid
             category.save()
             return JsonResponse({'context': 'ok'})
-    
     else:
         return JsonResponse({'context': 'errror'})
 
-# def practice(request):
+
+@check_isadmin
+def all_orders_admin(request):
+    order_status = request.GET.get('status')
     
-#     if request.method == 'POST':
-#         name = request.POST['name']
-#         email = request.POST['email']
-#         bio = request.POST['bio']
-#         print(name)
-#         print(email)
-#         print(bio)
+    if order_status:
+        orders = Order.objects.filter(order_status__icontains=order_status).order_by('-created_at')
+    else: 
+        orders = Order.objects.all().order_by('-created_at')
+    context = {
+        'orders': orders
+    }
+    return render(request, 'admin_templates/order-control/all_orders.html',context)
+
+@check_isadmin
+def admin_order_history_detail(request,order_id):
+    order = Order.objects.get(order_number = order_id)
+    order_products = OrderProduct.objects.filter(order=order)
+    total = 0
+    for order_product in order_products:
+        total += order_product.product_price * order_product.quantity
     
-#     return render(request, 'admin_templates/practice.html')
+    try:
+        payment = Payment.objects.filter(payment_id = order.payment)[0]
+    except:
+        payment = None
+    form = ChangeOrderStatusForm(instance = order)
+    context = {
+        'order': order,
+        'order_products': order_products,
+        'total': total,
+        'payment': payment,
+        'form': form,
+    }
+    return render(request, 'admin_templates/order-control/order_details.html',context)
+
+    
+@check_isadmin
+def change_order_status_admin(request):
+    is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+    if request.method == "POST" and is_ajax:
+        data = json.load(request)
+        order_number = data.get('order_number')
+        selected_option = data.get('selected_option')
+        print("order number is  :",order_number)
+        print("selected option is  :",selected_option)
+        # Update the order status based on the order_number and selected_option
+        try:
+            order = Order.objects.get(order_number=order_number)
+            order.order_status = selected_option
+            order.save()
+            return JsonResponse({"status": "success", "selected_option": selected_option})
+        except Order.DoesNotExist:
+            return JsonResponse({"status": "error", "message": "Order Not Found"})
+        # Return a JSON response indicating success or failure
+        
+    else:
+        # Return a JSON response indicating an invalid request
+        return JsonResponse({"status": "error", "message": "Invalid request"})
+    
+    
+#Coupon management
+    
+@check_isadmin
+def all_coupon(request):
+    
+    coupons = Coupon.objects.all()
+    context = {
+        'coupons': coupons,
+        }
+    return render(request, 'admin_templates/coupon_management/all_coupon.html', context)
+
+
+@check_isadmin
+def create_coupon(request):
+    
+    form = CouponForm()
+    if request.method == 'POST':
+        form = CouponForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Coupon created")
+            return redirect('admin-all-coupon')
+        else:
+            context = {'form' : form}
+            return render(request, 'admin_templates/coupon_management/coupon-create.html', context)
+        
+    context = {'form': form}
+    return render(request, 'admin_templates/coupon_management/coupon-create.html', context)
+
+
+@check_isadmin
+def edit_coupon(request, id):
+    
+    try:
+        coupon = Coupon.objects.get(id=id)
+    except Coupon.DoesNotExist:
+        return redirect('admin-all-coupon')
+    except ValueError:
+        return redirect('admin-all-coupon')
+
+    form = CouponForm(instance=coupon)
+    if request.method == 'POST':
+        form = CouponForm(request.POST, instance=coupon)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Coupon updated")
+            return redirect('admin-all-coupon')
+        else:
+            messages.error(request, form.errors)
+            return render(request, 'admin_templates/coupon_management/coupon-edit.html', {'form': form, 'id': id})
+    context = {'form': form,'id': id}
+    return render(request, 'admin_templates/coupon_management/coupon-edit.html', context)
+

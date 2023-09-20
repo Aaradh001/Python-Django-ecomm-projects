@@ -32,22 +32,15 @@ urlpatterns = [
     path('category-management/a2d/<str:cat_slug>/', views.category_control, name='category_control'),
     path('category-control/', views.category_control, name='category_control'),
 
-# <--------------------------Practice URLS-------------------------->
+# <--------------------------Order management URLS--------------------------->
+    path('all-orders/', views.all_orders_admin, name='all_orders_admin'),
+    path("orders/detail/<str:order_id>", views.admin_order_history_detail, name="admin-order-history-detail"),
+    path("orders/detail/change/status", views.change_order_status_admin, name="change_order_status_admin"),
 
 
-    
-    
-#     path('', views.admin_dashboard, name='admin_dashboard'),
-#     # path('signin/',views.user_signin, name='signin'),
-#     # path('desthome/',views.user_desthome, name='desthome'),
-#     # path('admindesthome/',views.admin_desthome, name='admindesthome'),
-#     # path('signout',views.signout, name='signout'),
-#     # path('register/',views.user_register, name='user_register'),
-#     # path('adminregister/', views.admin_register, name='admin_register'),
-#     # path('user-home/',views.user_home, name='user_home'),
-#     # path('admin-home/',views.admin_home, name='admin_home'),
-#     # path('logout/',views.logoutpage, name='logout'),
-#     # path('admin-home/user/update/<int:id>',views.useredit, name='useredit'),
-#     # path('admin-home/user/delete/<int:id>',views.user_delete, name='user_delete'),
-#     # path('admin-home/create-user',views.userCreate, name='user_create'),
+# <--------------------------Coupon management URLS--------------------------->
+    path("coupon", views.all_coupon, name="admin-all-coupon"),
+    path("coupon/create", views.create_coupon, name="admin-coupon-create"),
+    path("coupon/edit/<int:id>", views.edit_coupon, name="admin-coupon-edit"),
+
 ]

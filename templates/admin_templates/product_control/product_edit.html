@@ -45,14 +45,11 @@
                             <label for="id_stock" class="form-label">Quantity in stock</label>
                             {{ form.stock }}
                         </div>
+                        <div class="mb-3 col-6">
+                            <label for="id_is_available" class="form-label me-3">Is available</label>
+                            {{ form.is_available }}
+                        </div>
 
-
-
-
-
-
-
-                        <p>{{form.errors}}</p>
                         <div class="mb-3 col-12">
                           <label for="id_images" class="form-label">Product image</label>
                           <div class="d-flex  justify-content-start">
@@ -64,6 +61,7 @@
                             </div>
                           </div>
                         </div>
+                        <p>{{form.errors}}</p>
                         
                         <div class="form-row mt-4">
                           <p class="form-label">Additional images</p>

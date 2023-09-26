@@ -3,12 +3,7 @@
 
 {% block content %}
 <div class="row">
-  {% if messages %}
-	{% for message in messages %}
-	<p {% if message.tags %} class="{{ message.tags }} p-0 m-0 text-danger bg-light" {% endif %}>
-		{{ message }}</p>
-	{% endfor %}
-	{% endif %}
+  {% include 'admin_templates/general/alerts.html' %}
     <div class="col-lg-12 d-flex align-items-stretch">
       <div class="card w-100">
         <div class="card-body p-4">
@@ -35,12 +30,6 @@
                     <h6 class="fw-semibold mb-0">Category</h6>
                   </th>
                   <th class="border-bottom-0">
-                    <h6 class="fw-semibold mb-0">Price</h6>
-                  </th>
-                  <th class="border-bottom-0">
-                    <h6 class="fw-semibold mb-0">Stock (in Nos)</h6>
-                  </th>
-                  <th class="border-bottom-0">
                     <h6 class="fw-semibold mb-0">Is available</h6>
                   </th>
                   <th class="border-bottom-0">
@@ -51,29 +40,24 @@
               
                 {% for product in products %}
                 <tr>
-                  <td class="border-bottom-0">
-                    <h6 class="fw-normal tablecontent mb-1">{{ forloop.counter }}</h6>
-                    <a href="{% url 'product_update' product.id %}"><img class="mb-1" src="{% static './images/extras/pencil-square.svg' %}" alt="edit"></a>
-                    <!---->
+                  <td class="border-bottom-0 text-center">
+                    <h6 class="fw-semibold tablecontent mb-1">{{ forloop.counter }}</h6>
                   </td>
                   <td class="border-bottom-0">
-
-                    <img class="prod-img-inlist" src="{{ product.images.url }}" alt="">
+                    <a href="{% url 'product_update' product.prod_slug %}">
+                      <img style="width: 60px;" class="prod-img-inlist" src="/media/{{ product.image }}" alt="">
+                    </a>
                   </td>
                   <td class="border-bottom-0">
-                    <h6 class="fw-normal mb-1">{{product.product_name}}</h6>
+                    <a href="{% url 'product_update' product.prod_slug %}">
+                      <h6 class="text-decoration-underline text-primary fw-normal mb-1">{{product.product_name}}</h6>
+                    </a>
                   </td>
                   <td class="border-bottom-0">
                     <h6 class="fw-normal mb-1">{{product.brand}}</h6>
                   </td>
                   <td class="border-bottom-0">
                     <h6 class="fw-normal mb-1">{{product.category}}</h6>
-                  </td>
-                  <td class="border-bottom-0">
-                      <h6 class="fw-normal mb-1 ">{{product.price}}</h6>
-                  </td>
-                  <td class="border-bottom-0">
-                    <p class="mb-1 fw-normal">{{product.stock}}</p>
                   </td>
                   <td class="border-bottom-0">
                     <div class="mb-1">
@@ -88,11 +72,11 @@
                   </td>
                   <td class="border-bottom-0">
                     {% if product.is_available %}
-                    <a href="{% url 'product_control' product.id %}">
+                    <a href="{% url 'product_control' product.prod_slug %}">
                       <button class="btn btn-danger mb-1 px-3">Disable</button>
                     </a>
                     {% else %}
-                    <a href="{% url 'product_control' product.id %}">
+                    <a href="{% url 'product_control' product.prod_slug %}">
                       <button class="btn btn-success mb-1">Enable</button>
                     </a>
                     {% endif %}

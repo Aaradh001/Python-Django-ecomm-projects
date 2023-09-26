@@ -1,5 +1,5 @@
 from django.db import models
-from store.models import Product
+from store.models import ProductVariant
 from accounts.models import Account
 from django.contrib.auth import get_user_model
 
@@ -14,7 +14,7 @@ class Cart(models.Model):
 
 class CartItem(models.Model):
     user = models.ForeignKey(Account, on_delete=models.CASCADE, null=True)
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    product = models.ForeignKey(ProductVariant, on_delete=models.CASCADE)
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE, null=True)
     qty = models.IntegerField()
     is_active = models.BooleanField(default=True)

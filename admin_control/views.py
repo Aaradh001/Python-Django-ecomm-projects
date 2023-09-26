@@ -6,17 +6,17 @@ from django.urls import reverse
 from accounts.forms import UserRegistrationForm
 from category_management.forms import CategoryForm
 from category_management.models import Category
-from store.forms import ProductCreationForm
-# from store import forms
+from store.forms import ProductForm, ProductVariantForm, BrandForm
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.cache import cache_control
 import random
 from accounts.models import UserProfile
-from store.models import Product, ProductImage
+from store.models import Product, ProductVariant, ProductImage, Attribute, AttributeValue, Brand
 from accounts.otp_verification.helper import MessageHandler
 from coupon_management.models import Coupon
 from coupon_management.forms import CouponForm
-from django.http import HttpResponseBadRequest, JsonResponse
+from django.http import JsonResponse
+from django.db.models import OuterRef, Subquery
 import json
 
 # Order management
@@ -253,17 +253,21 @@ def admin_signout(request):
 @check_isadmin
 def product_listing(request):
 
-    if not ( request.user.is_authenticated and request.user.is_superadmin):
-        return redirect('admin_signin')
-        
-    products = Product.objects.all()
-    context = {'products': products}
+            
+    # products = Product.objects.all().annotate()
+    products = Product.objects.annotate(
+    image=Subquery(
+        ProductVariant.objects.filter(product_id=OuterRef('pk')).values('thumbnail_image')[:1]
+    )
+    
+)
+    context = {'products': products,}
     return render(request, 'admin_templates/product_control/product_listing.html', context)
 
 
 @check_isadmin
-def product_control(request, id):
-    product = Product.objects.get(id=id)
+def product_control(request, prod_slug):
+    product = Product.objects.get(prod_slug=prod_slug)
     product.is_available = not product.is_available
     product.save()
     return redirect('products')
@@ -272,108 +276,301 @@ def product_control(request, id):
 # @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @check_isadmin
 def add_product(request):
-    form = ProductCreationForm()
+    product_form = ProductForm()
+    variant_form = ProductVariantForm()
+    variant_form.fields.pop('attributes', None)
+    attributes = Attribute.objects.prefetch_related('attributevalue_set').filter(is_active=True)
+    
+    attribute_dict = {}
+    for attribute in attributes:
+        attribute_values = attribute.attributevalue_set.filter(is_active=True)
+        attribute_dict[attribute.attribute_name] = attribute_values
+    #to show how many atribute in frondend
+    attribute_values_count = attributes.count()
 
     if request.method == 'POST':
-        form = ProductCreationForm(request.POST, request.FILES)
+        product_form = ProductForm(request.POST)
+        variant_form = ProductVariantForm(request.POST, request.FILES)
+        variant_form.fields.pop('attributes', None)
+        attribute_ids=[]
+        #getting all atributes
+        for i in range(1,attribute_values_count+1):
+            attribute_value_id = request.POST.get('attributes_'+str(i))
+            if attribute_value_id != 'None':
+                attribute_ids.append(int(attribute_value_id))
         
-        if form.is_valid():
-            product_name = form.cleaned_data['product_name']
-            brand = form.cleaned_data['brand']
-            description = form.cleaned_data['description']
-            price = form.cleaned_data['price']
-            images = form.cleaned_data['images']
-            stock = form.cleaned_data['stock']
-            category = form.cleaned_data['category']
-            is_available = form.cleaned_data['is_available']
-            
-            product = Product.objects.create(
-                product_name = product_name,
-                brand = brand,
-                description = description,
-                price = price,
-                images = images,
-                stock = stock,
-                category = category,
-                is_available = is_available,
-                )
-            
-            input_images = []
-            for i in range(1,5):
-                image = request.FILES['add_image' + str(i)]
-                if image:
-                    input_images.append(image)
-            
-            image_list = []            
-            for i in input_images:
-                image_list.append(ProductImage(product = product, image = i))
-            
-            if image_list:
-                ProductImage.objects.bulk_create(image_list)            
-                
+        if product_form.is_valid() and variant_form.is_valid():
+            product = product_form.save()
+            variant = variant_form.save(commit=False)
+            variant.thumbnail_image = request.FILES.get('thumbnail_image')
+            variant.product = product
+            variant.save()
+            variant.attributes.set(attribute_ids) # Save ManyToManyField relationships
+            additional_images = request.FILES.getlist('additional_images')
+            for image in additional_images:
+                ProductImage.objects.create(product_variant=variant, image=image)
+
             messages.success(request, 'Product added')
             return redirect('products')    
+        
         else:
+            print(product_form.errors)
+            print("----------------------------------------------------")
+            print(variant_form.errors)
+            messages.error(request, variant_form.errors)
+            
             context = {
-                'form': form,
-            }
+                'product_form': product_form,
+                'variant_form': variant_form,
+                'attribute_dict': attribute_dict,
+                }
             return render(request, 'admin_templates/product_control/product_add.html', context)
     else:
         context = {
-            'form' : form,
-        }
+            'product_form': product_form,
+            'variant_form': variant_form,
+            'attribute_dict': attribute_dict,
+            }
     return render(request, 'admin_templates/product_control/product_add.html', context)
 
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @check_isadmin
-def product_update(request, id):
+def product_update(request, prod_slug):
 
-    product = Product.objects.get(id=id)
-    prod_images = ProductImage.objects.filter(product=product)
-    form = ProductCreationForm(instance = product)
+    product = Product.objects.get(prod_slug=prod_slug)
+    product_variants = ProductVariant.objects.filter(product = product)
+    form = ProductForm(instance = product)
 
     if request.method == 'POST':
-        form = ProductCreationForm(request.POST, request.FILES, instance=product)
+        form = ProductForm(request.POST, instance=product)
         if form.is_valid():
-            product = form.save(commit=False)
-            product.is_available = form.cleaned_data['is_available']
             form.save()
-            input_images = []
-            for i in range(1,5):
-                try:
-                    image = request.FILES['add_image'+str(i)]
-                    image_value = request.POST.get('product-image' + str(i), "")
-                    print(image_value)
-                    input_images.append([image, image_value])
-                except:
-                    pass
-            
-            for i in input_images:
-                if i[0]:
-                    change_image = ProductImage.objects.get(id = i[1])
-                    change_image.image = i[0]
-                    change_image.save()
-            
             messages.success(request, "Product updated")
             return redirect('products')
             
         else:
             messages.error(request, form.errors)
-            print(form.errors)
-            return render(request, 'admin_templates/product_control/product_edit.html', {'form': form, 'id': id})
+            return redirect('product_update', prod_slug)
     
     context = {
-        'form': form, 
-        'id': id,
-        'range': range(5),
-        'product': product,
-        'prod_images': prod_images,
+        'form': form,
+        'product_variants':product_variants, 
+        'prod_slug': prod_slug,
         }
     return render(request, 'admin_templates/product_control/product_edit.html', context)
     
     
-    # <--------------------category management-------------------->
+@check_isadmin
+def add_product_variant(request, product_slug):
+    try:
+        product = Product.objects.get(prod_slug=product_slug) 
+    except Product.DoesNotExist:
+        return redirect('admin-all-product')
+    except ValueError:
+        return redirect('admin-all-product')
+    
+    product_variant_form = ProductVariantForm()
+    product_variant_form.fields.pop('attributes', None)
+    # attributes = Attribute.objects.all()
+    attributes = Attribute.objects.prefetch_related('attributevalue_set')
+    attribute_dict = {}
+    for attribute in attributes:
+        attribute_values = attribute.attributevalue_set.filter(is_active = True)
+        attribute_dict[attribute.attribute_name] = attribute_values
+    
+    attribute_values_count = attributes.count()
+    
+    if request.method == 'POST':
+        product_variant_form = ProductVariantForm(request.POST, request.FILES)
+        print(product_variant_form.fields)
+        product_variant_form.fields.pop('attributes', None)
+        attribute_ids=[]
+        #getting all attributes
+        for i in range(1,attribute_values_count+1):
+            attribute_value_id = request.POST.get('attributes_'+str(i))
+            if attribute_value_id != 'None':
+                attribute_ids.append(int(attribute_value_id))
+        
+        thumbnail_image = request.FILES.get('thumbnail_image')
+        if product_variant_form.is_valid():
+            variant = product_variant_form.save(commit=False)
+            variant.product = product
+            variant.thumbnail_image = thumbnail_image
+            variant.save()
+            variant.attributes.set(attribute_ids)    # Save ManyToManyField relationships
+            variant.save()
+            additional_images = request.FILES.getlist('additional_images')
+            
+            for image in additional_images:
+                ProductImage.objects.create(product_variant=variant, image=image)
+            messages.success(request, "Variant Created")
+            
+            return redirect('product_update',product_slug)
+        else:
+            print(product_variant_form.errors)
+            messages.error(request, product_variant_form.errors)
+            return redirect('product-variant-add', product_slug)
+    
+    context = {
+        'product_variant_form': product_variant_form,
+        'product_slug': product_slug,
+        'product': product,
+        'attribute_dict': attribute_dict,
+        }
+    return render(request, 'admin_templates/product_control/product_variant_create.html',context)
+
+
+@check_isadmin
+def product_variant_update(request, product_variant_slug):
+    try:
+        product_variant = ProductVariant.objects.get(product_variant_slug = product_variant_slug)
+    except ProductVariant.DoesNotExist:
+        return redirect('products')
+    except ValueError:
+        return redirect('products')
+    
+    product_variant_form = ProductVariantForm(instance = product_variant)
+    current_additional_images = product_variant.product_images.all()
+    
+    is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+    if request.method == "POST" and is_ajax:
+        image = request.FILES['file']
+        image_id = request.POST['image_id']
+        
+        if image_id == 'thumbnail':
+            image_id = None
+            
+        if image and image_id:
+            try:
+                additional_image = ProductImage.objects.get(id = image_id)
+                additional_image.image = image
+                additional_image.save()
+                return JsonResponse({"status": "success",
+                                     'new_image': additional_image.image.url,})
+            except Exception as e :
+                print(e)
+    
+        elif image and (not image_id):
+            
+            try:
+                product_variant.thumbnail_image = image
+                product_variant.save()
+                
+                return JsonResponse({
+                    'status': 'success',
+                    'new_image': product_variant.thumbnail_image.url,
+                    })
+            except Exception as e :
+                print(e)
+        else:
+            return JsonResponse({"status": "error", "message": "image send error !"})
+        
+    
+    if request.method == 'POST':
+        print("----------------------")
+        product_variant_form = ProductVariantForm(request.POST,instance=product_variant)
+        if product_variant_form.is_valid():
+            variant = product_variant_form.save()
+            
+            messages.success(request, "Variant Updated")
+            print("not working post")
+            return redirect('product_update', product_variant.product.prod_slug)
+        else:
+            messages.error(request, product_variant_form.errors)
+            context = {
+                'product_variant_form': product_variant_form,
+                'product_variant_slug':product_variant_slug,
+                'product_variant': product_variant,
+                'current_additional_images': current_additional_images,
+            }
+            
+            return render(request, 'admin_templates/product_control/product_variant_edit.html', context)
+        
+    
+    context = {
+        'product_variant_form': product_variant_form,
+        'product_variant_slug': product_variant_slug,
+        'product_variant': product_variant,
+        'current_additional_images': current_additional_images,
+        }
+    return render(request, 'admin_templates/product_control/product_variant_edit.html',context)
+    
+
+
+@check_isadmin
+def delete_product_variant(request,product_variant_slug):
+    
+    try:
+        product_variant = ProductVariant.objects.get(product_variant_slug=product_variant_slug)
+    except ProductVariant.DoesNotExist:
+        return redirect('products')
+    except ValueError:
+        return redirect('products')
+    product_variant.delete()
+    messages.error(request, "Variant Deleted ❌")
+    return redirect('products')
+
+    
+    # <--------------------Brand management-------------------->
+    
+@check_isadmin
+def all_brand(request):
+    
+    brands = Brand.objects.all()
+    context = {
+        'brands':brands
+    }
+    return render(request, 'admin_templates/product_control/all_brand.html',context)
+
+
+@check_isadmin
+def brand_control(request):
+    is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+    
+    if request.method == 'POST' and is_ajax:
+        data = json.load(request)
+        brand_id = int(data['checkboxValue'])
+        try:
+            brand = Brand.objects.get(id =brand_id)
+            brand.is_active = not brand.is_active
+            brand.save()
+            return JsonResponse({
+                'status': 'success',
+                'brand_status': brand.is_active,
+                })
+        except Exception as e :
+            print(e)
+            return JsonResponse({"status": "error", "message": e })
+        
+
+
+
+@check_isadmin
+def create_brand(request):
+    
+    form = BrandForm()
+    if request.method == 'POST':
+        form = BrandForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Brand created ")
+            return redirect('admin_all_brand')
+        else:
+            messages.error(request, form.errors)
+            context = {'form': form}
+            return render(request, 'admin_templates/product_control/create_brand.html',context)
+        
+    context = {'form':form}
+    return render(request, 'admin_templates/product_control/create_brand.html',context)
+
+
+    
+    
+    # <--------------------Brand management end-------------------->
+    
+    
+    # <--------------------Category management-------------------->
     
  
 

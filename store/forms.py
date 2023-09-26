@@ -1,30 +1,47 @@
 from django import forms
-from store.models import Product
+from store.models import Product, ProductVariant, Brand, Attribute, AttributeValue
 # from django.contrib.auth import get_user_model
 
 
-class ProductCreationForm(forms.ModelForm):
+
+# Form for adding and editing product 
+
+class ProductForm(forms.ModelForm):
     
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+   
+        for field_name, field in self.fields.items():
+            field.widget.attrs['class'] = 'form-control'
+        self.fields['is_available'].widget.attrs['class'] = 'form-check-input'
+        
     class Meta:
         model = Product
-        fields = [
-                'product_name',
-                'brand',
-                'description',
-                'price',
-                'images',
-                'stock',
-                'is_available',
-                'category',
-                ]
+        fields = '__all__'
+        exclude = ['prod_slug',]
         
-        widgets = {
-            'product_name': forms.TextInput(attrs = {'class': 'form-control'}),
-            'brand': forms.TextInput(attrs = {'class': 'form-control'}),
-            'description': forms.TextInput(attrs = {'class': 'form-control'}),
-            'price': forms.TextInput(attrs = {'class': 'form-control'}),
-            'stock': forms.TextInput(attrs = {'class': 'form-control'}),
-            'is_available': forms.CheckboxInput(attrs = {'class': 'form-check-input'}),
-            'images': forms.FileInput(attrs = {'class': 'form-control'}),
-            'category': forms.Select(attrs = {'class': 'form-control'}),
-            }
+
+
+class ProductVariantForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+   
+        for field_name, field in self.fields.items():
+            field.widget.attrs['class'] = 'form-control'
+            
+        self.fields['is_active'].widget.attrs['class'] = ''
+        
+
+    class Meta:
+        model = ProductVariant
+        fields = '__all__'
+        exclude = ['product','thumbnail_image', 'product_variant_slug','additional_images']
+
+
+class BrandForm(forms.ModelForm):
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+    class Meta:
+        model = Brand
+        fields = '__all__'

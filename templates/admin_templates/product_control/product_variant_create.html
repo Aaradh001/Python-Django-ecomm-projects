@@ -1,0 +1,101 @@
+{% extends 'admin_templates/base_admin.html' %}
+{% load static %}
+
+{% block content %}
+<section class="section-conten" style="min-height:84vh">
+	
+	<!-- ============================ COMPONENT LOGIN   ================================= -->
+  <div class="container">
+    {% include 'admin_templates/general/alerts.html' %}
+    <div class="card mb-3 " >
+      <h4 class="card-header">Add product variant </h4>
+        <div class="card-body">
+          <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="row mb-4">
+              <div class="col-12 mb-4">
+                <label for="product" class="form-label">Product name: </label>
+                <h4 class="bg-primary-subtle text-center p-3 m-0 rounded"> {{product.product_name}}</h4>
+                <input hidden type="text" id="product" class="form-control" name="product" value="{{ product }}" readonly>
+              </div>
+
+
+              <div class="mb-3 col-6">
+                <label class="form-label">Sku id</label>
+                {{product_variant_form.sku_id}}
+                <div class=" error-msg">{{add_product_variant_form.sku_id.errors}}</div>
+              </div>
+
+              <div class="mb-3 col-6">
+                <label class="form-label">Stock</label>
+                {{product_variant_form.stock}}
+                <div class=" error-msg">{{add_product_variant_form.stock.errors}}</div>
+              </div>
+
+              <div class="mb-3 col-6">
+                <label class="form-label">Maximum Price</label>
+                {{product_variant_form.max_price}}
+                <div class=" error-msg">{{add_product_variant_form.max_price.errors}}</div>
+              </div>
+
+              <div class="mb-3 col-6">
+                <label class="form-label">Sale Price</label>
+                {{product_variant_form.sale_price}}
+                <div class=" error-msg">{{add_product_variant_form.sale_price.errors}}</div>
+              </div>
+
+              <div class="mb-3 mt-4 col-12">
+                <div class="card-header form-label">
+                  <label class="card-title form-label" >Choose Attributes</label>
+                  <hr>
+                  <div class="row">
+                    
+                    {% for attribute_name, attribute_values in attribute_dict.items %}
+                    <div class="col-3">
+                      <label class="form-label">{{attribute_name}}</label>
+                      <select name="attributes_{{ forloop.counter }}" class="form-control" {% if not attribute_values %} disabled {% endif %}>
+                        {% if not attribute_values %}
+                          <option  value="None">Empty</option>
+                        {% else %}
+                          <option  value="None">Select</option>
+                        {% endif %}
+                        
+                        {% for value in attribute_values %}
+                          <option value="{{ value.id }}">{{ value.attribute_value }}</option>
+                        {% endfor %}
+                      </select>
+                    </div>
+                    {% endfor %}
+                  </div>
+                  <!-- {{variant_form.atributes}} -->
+                  <div class=" error-msg">{{variant_form.atributes.errors}}</div>
+                </div>
+              </div>
+
+              <div class="my-3 col-12">
+                <label class="form-label">Thumbnail Image</label>
+                <input type="file" name="thumbnail_image" class="form-control" accept=".jpg,.jpeg,.webp,.png">
+                <hr>
+              </div>
+              <div class="mb-3 col-12">
+                <label class="form-label">Additional Images</label>
+                <input type="file" name="additional_images" class="form-control" multiple accept=".jpg,.jpeg,.webp,.png">
+                <hr>
+              </div>
+
+              <div class="mb-3 col-12">
+                <label class="form-label">Available</label>
+                {{product_variant_form.is_active}}
+              </div>
+            </div>
+            <button type="submit" class="btn btn-primary w-25">Create Variant</button>
+            <a href="{% url 'product_update' product_slug %}" class="btn btn-dark ms-3">Go Back</a>
+          </form>
+          <hr>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

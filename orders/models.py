@@ -16,7 +16,7 @@ class PaymentMethod(models.Model):
 
 class Payment(models.Model):
     PAYMENT_STATUS_CHOICES =(
-        ("PENDING", "Pending"),
+        ("PENDING", "Pending niop"),
         ("FAILED", "Failed"),
         ("SUCCESS", "Success"),
         )

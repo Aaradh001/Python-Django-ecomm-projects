@@ -9,104 +9,121 @@
           <div class="card">
             <div class="card-body">
               <h5 class="card-title fw-semibold mb-4">Add product</h5>
-              <div class="card">
-                <div class="card-body">
-                  <form method="POST" enctype="multipart/form-data">
-                    {% csrf_token %}
-                    <div class="row">
-                        <div class="mb-3 col-6">
-                            <label for="id_product_name" class="form-label">Product name:</label>
-                            {{form.product_name}}
-                        </div>
-                        <div class="mb-3 col-6">
-                            <label for="id_brand" class="form-label">Brand name:</label>
-                            {{ form.brand }}
-                        </div>
-                        
-                        <div class="mb-3 col-6">
-                            <label for="id_category" class="form-label">Category:</label>
-                            <select class="form-control" id="id_category" name="{{ form.category.name }}">
-                                <option value="" selected>Select</option>
-                                {% for choice in form.category.field.choices %}
-                                {% if choice.0 %}
-                                    <option  value="{{ choice.0 }}">{{ choice.1 }}</option>
-                                {% endif %}
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <div class="mb-3 col-12">
-                            <label for="id_description" class="form-label">Product description:</label>
-                            {{ form.description }}
-                        </div>
+              <form method="POST" enctype="multipart/form-data">
+                  {% csrf_token %}
+                    <div class="card">
+                        <div class="card-body">
+                                <div class="row">
+                                    <div class="mb-3 col-6">
+                                        <label for="id_product_name" class="form-label">Product name:</label>
+                                        {{product_form.product_name}}
+                                    </div>
+                                    <div class="mb-3 col-6">
+                                        <label for="id_brand" class="form-label">Brand name:</label>
+                                        {{ product_form.brand }}
+                                    </div>
+                                    
+                                    <div class="mb-3 col-6">
+                                        <label for="id_category" class="form-label">Category:</label>
+                                       {{product_form.category}}
+                                    </div>
+                                    <div class="mb-3 col-12">
+                                        <label for="id_description" class="form-label">Product description:</label>
+                                        {{ product_form.description }}
+                                    </div>
 
-                        <div class="mb-3 col-6">
-                            <label for="id_price" class="form-label">Price:</label>
-                            {{ form.price }}
+                                    <div class="mb-3 col-6">
+                                        <label for="id_is_available" class="form-label">Is available:</label>
+                                        {{ product_form.is_available }}
+                                    </div>
+                                    
+                                    
+                                </div>
+                                
+                            </div>
                         </div>
-                        <div class="mb-3 col-6">
-                            <label for="id_price" class="form-label">Quantity in stock:</label>
-                            {{ form.stock }}
-                        </div>
+                    <h5 class="card-title fw-semibold mb-4">Create product variant</h5>
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="mb-3 col-6">
+                                    <label class="form-label">SKU ID / Model:No</label>
+                                    {{variant_form.sku_id}}
+                                    <div class=" error-msg">{{variant_form.sku_id.errors}}</div>
+                                </div>
+                        
+                                <div class="mb-3 col-6">
+                                    <label class="form-label">Stock</label>
+                                    {{variant_form.stock}}
+                                    <div class=" error-msg">{{variant_form.stock.errors}}</div>
+                                </div>
+                    
+                                <div class="mb-3 col-6">
+                                    <label class="form-label">Maximum Price</label>
+                                    {{variant_form.max_price}}
+                                    <div class=" error-msg">{{variant_form.max_price.errors}}</div>
+                                </div>
+                    
+                                <div class="mb-3 col-6">
+                                    <label class="form-label">Sale Price</label>
+                                    {{variant_form.sale_price}}
+                                    <div class=" error-msg">{{variant_form.sale_price.errors}}</div>
+                                </div>
 
-                        <div class="mb-3 col-6">
-                            <label for="id_is_available" class="form-label">Is available:</label>
-                            {{ form.is_available }}
-                        </div>
-                        
-                        <div class="mb-3 col-12">
-                            <label for="id_price" class="form-label">Product image:</label>
-                            {{ form.images }}
-                        </div>
-                        <p class="form-label">Additional images:</p>
-                        <div class="form-row">
-                            <div class="mb-3 col-md-6">
-                                <input type="file" class="form-control" id="photo" name="add_image1" accept=".jpg,.jpeg,.webp,.png">
-                            </div>
-                            <div class="mb-3 col-6">
-                                <input type="file" class="form-control" id="photo" name="add_image2" accept=".jpg,.jpeg,.webp,.png">
-                            </div>
-                            <div class="mb-3 col-6">
-                                <input type="file" class="form-control" id="photo" name="add_image3" accept=".jpg,.jpeg,.webp,.png">
-                            </div>
-                            <div class="mb-3 col-6">
-                                <input type="file" class="form-control" id="photo" name="add_image4" accept=".jpg,.jpeg,.webp,.png">
-                            </div>
-                        </div>
-                        <!-- <div class="form-row">
-                          <div class="form-group col-md-6"> -->
-                              <!-- <label>Quantity in stock</label>
-                              <input class="form-control" name="stock" type="password"> -->
-                          <!-- </div> form-group end.//  -->
-                          <!-- <div class="form-group col-md-6"> -->
-                              <!-- <label>Repeat password</label>
-                              <input class="form-control" name="confirm-password" type="password"> -->
-                        <!-- </div> form-group end.//  
-                        </div> -->
-                        <!-- <div>
-                            <br><br>
-                            <div class="mb-3 col-6">
-                                <label for="id_is_available" class="form-label">Is available</label>
-                                {{ form.is_available }}
-                            </div>
-                        </div> -->
-                        
-                        <!-- <div class="mb-3 col-6">
-                            <label for="id_password" class="form-label">Password</label>
-                            {{form.password}}
-                            <input type="password" class="form-control" id="id_password">
-                        </div> -->
-                        <div class="row">
-                            
-                            <div class="d-flex justify-content-center align-items-baseline col px-3 mb-2">
-                                <button type="submit" class="btn btn-primary me-3">Add product</button>
+                                <div class="mb-3 mt-4 col-12">
+                                    <div class="card-header form-label">
+                                    <label class="card-title form-label" >Choose Attributes</label>
+                                    <hr>
+                                    <div class="row">
+                                        
+                                        {% for attribute_name, attribute_values in attribute_dict.items %}
+                                            <div class="col-3">
+                                                <label class="form-label">{{attribute_name}}</label>
+                                                <select name="attributes_{{ forloop.counter }}" class="form-control" {% if not attribute_values %} disabled {% endif %}>
+                                                    {% if not attribute_values %}
+                                                    <option  value="None">Empty</option>
+                                                    {% else %}
+                                                    <option  value="None">Select</option>
+                                                    {% endif %}
+                                                    
+                                                    {% for value in attribute_values %}
+                                                    <option value="{{ value.id }}">{{ value.attribute_value }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
+                                            {% endfor %}
+                                        </div>
+                                        <!-- {{variant_form.atributes}} -->
+                                        <div class=" error-msg">{{variant_form.atributes.errors}}</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="my-3 col-12">
+                                    <label class="form-label">Thumbnail Image</label>
+                                    <input type="file" name="thumbnail_image" class="form-control" accept=".jpg,.jpeg,.webp,.png">
+                                    <hr>
+                                </div>
+                                <div class="mb-3 col-12">
+                                    <label class="form-label">Additional Images</label>
+                                    <input type="file" name="additional_images" class="form-control" multiple accept=".jpg,.jpeg,.webp,.png">
+                                    <hr>
+                                </div>
+                                
+                                <div class="mb-3 col-12">
+                                    <label class="form-label">Variant available</label>
+                                    {{variant_form.is_active}}
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="d-flex justify-content-center align-items-baseline col px-3 mb-2">
+                                        <button type="submit" class="btn btn-primary me-3">Add product</button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </form>
-                </div>
-              </div>
-            </div>
-          </div>
+        </div>
         </div>
         <!-- card .// -->
 

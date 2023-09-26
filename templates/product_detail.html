@@ -4,179 +4,192 @@
 {% block content %}
 {% include 'includes/header.html' %}
 
-<style>
-    
-    .shows {
-        width: 400px;
-        height: 400px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
-
-    .small-img {
-        width: 350px;
-        height: 70px;
-        margin-top: 10px;
-        position: relative;
-        left: 25px;
-    }
-
-    .small-img .icon-left, .small-img .icon-right {
-        width: 12px;
-        height: 24px;
-        cursor: pointer;
-        position: absolute;
-        top: 0;
-        bottom: 0;
-        margin: auto 0;
-    }
-
-    .small-img .icon-left { transform: rotate(180deg) }
-
-    .small-img .icon-right { right: 0; }
-
-    .small-img .icon-left:hover, .small-img .icon-right:hover { opacity: .5; }
-
-    .small-container {
-        width: 310px;
-        height: 70px;
-        overflow: hidden;
-        position: absolute;
-        left: 0;
-        right: 0;
-        margin: 0 auto;
-    }
-
-    .small-container div {
-        width: 100%;
-        position: relative;
-    }
-
-    .small-container .show-small-img {
-        width: 70px;
-        height: 70px;
-        margin-right: 6px;
-        cursor: pointer;
-        float: left;
-    }
-
-    .small-container .show-small-img:last-of-type { margin-right: 0; }
-
-</style>
-<section class="section-content padding-y bg">
-    <div class="container">
-    
-    <!-- ============================ COMPONENT 1 ================================= -->
-    <div class="card">
-        <div class="row no-gutters">
-            <aside class="col-md-6 test11">
-            <article class="gallery-wrap"> 
-                <!-- <div class="product">
-                    <a href="#"><img src="{{single_product.images.url}}" class="img-fluid"></a>
-                </div> -->
-                
-                <!-- Primary carousel image -->
-                
-                <div class="product-image" >
-                    <div class="shows">
-                        <div class="d-flex justify-content-center">
-                            <img src="{{single_product.images.url}}" id="show-img">
-                        </div>
-                    </div>
-                </div>
-                    
-                <!-- Secondary carousel image thumbnail gallery -->
-
-                <div class="small-img">
-                <img src="{% static './images/test1/next-icon.png' %}" class="icon-left" alt="" id="prev-img">
-                    <div class="small-container">
-                    <div id="small-img-roll">
-                        <img src="{{single_product.images.url}}" class="show-small-img" alt="">
-                        {% for add_image in add_images %}
-                        <img src="{{add_image.image.url}}" class="show-small-img" alt="">
-                        {% endfor %}
-                    </div>
-                    </div>
-                <img src="{% static './images/test1/next-icon.png' %}" class="icon-right" alt="" id="next-img">
-                </div>
-
-
-
-
-
-
-
-
-
-                 <!-- img-big-wrap.// -->  
-            </article> <!-- gallery-wrap .end// -->
-            </aside>
-            <main class="col-md-6 border-left">
-    <article class="content-body">
+    <style>
         
-        <h2 class="title">{{single_product.brand}} {{single_product.product_name}} {{single_product.category}}</h2>
+        .shows {
+            width: 400px;
+            height: 400px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .small-img {
+            width: 350px;
+            height: 70px;
+            margin-top: 10px;
+            position: relative;
+            left: 25px;
+        }
+
+        .small-img .icon-left, .small-img .icon-right {
+            width: 12px;
+            height: 24px;
+            cursor: pointer;
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            margin: auto 0;
+        }
+
+        .small-img .icon-left { transform: rotate(180deg) }
+
+        .small-img .icon-right { right: 0; }
+
+        .small-img .icon-left:hover, .small-img .icon-right:hover { opacity: .5; }
+
+        .small-container {
+            width: 310px;
+            height: 70px;
+            overflow: hidden;
+            position: absolute;
+            left: 0;
+            right: 0;
+            margin: 0 auto;
+        }
+
+        .small-container div {
+            width: 100%;
+            position: relative;
+        }
+
+        .small-container .show-small-img {
+            width: 70px;
+            height: 70px;
+            margin-right: 6px;
+            cursor: pointer;
+            float: left;
+        }
+
+        .small-container .show-small-img:last-of-type { margin-right: 0; }
+
+    </style>
+    <section class="section-content padding-y bg">
+        <div class="container">
         
-        <div class="mb-3"> 
-            <var class="price h4">&#8377; {{single_product.price}}</var> 
-        </div> 
+        <!-- ============================ COMPONENT 1 ================================= -->
+            <div class="card">
+                <div class="row no-gutters">
+                    <aside class="col-md-6 test11">
+                        <article class="gallery-wrap"> 
+                            <div class="product-image" >
+                                <div class="shows">
+                                    <div class="d-flex justify-content-center">
+                                        <img src="{{single_product.images.url}}" id="show-img">
+                                    </div>
+                                </div>
+                            </div>
+                                
+                            <!-- Secondary carousel image thumbnail gallery -->
+                            <div class="small-img">
+                                <img src="{% static './images/test1/next-icon.png' %}" class="icon-left" alt="" id="prev-img">
+                                    <div class="small-container">
+                                        <div id="small-img-roll">
+                                            <img src="{{single_product.images.url}}" class="show-small-img" alt="">
+                                            {% for add_image in add_images %}
+                                            <img src="{{add_image.image.url}}" class="show-small-img" alt="">
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                <img src="{% static './images/test1/next-icon.png' %}" class="icon-right" alt="" id="next-img">
+                            </div>
+
+                            <!-- img-big-wrap.// -->  
+                        </article> <!-- gallery-wrap .end// -->
+                    </aside>
+                    <main class="col-md-6 border-left">
+                        <form action="{% url 'add_cart' single_product.id %}" method="GET">
+                            {% csrf_token %}
+                            <article class="content-body">
+                                <h2 class="title">{{single_product.brand}} {{single_product.product_name}} {{single_product.category}}</h2>
+                                <div class="mb-3"> 
+                                    <var class="price h4">&#8377; {{single_product.price}}</var> 
+                                </div> 
+                                <p>{{single_product.description}}</p>
+                                <hr>
+                                <div class="row">
+                                    <div class="item-option-select">
+                                        <h6>Choose Color</h6>
+                                        <select name="color" id="" class="form-control">
+                                            <option value="red">Red</option>
+                                            <option value="blue">Blue</option>
+                                            <option value="green">Green</option>
+                                            <option value="white">White</option>
+                                            <option value="black">Black</option>
+                                        </select> 
+                                    </div>
+                                </div> <!-- row.// -->
+                                <div class="row">
+                                    <div class="item-option-select">
+                                        <h6>Select Size</h6>
+                                        <div class="btn-group btn-group-sm btn-group-toggle" data-toggle="buttons">
+                                            <label class="btn btn-light">
+                                                <input type="radio" name="radio_color"> S
+                                            </label>
+                                            <label class="btn btn-light active">
+                                                <input type="radio" name="radio_color" checked> M
+                                            </label>
+                                            <label class="btn btn-light">
+                                                <input type="radio" name="radio_color"> L
+                                            </label>
+                                            <label class="btn btn-light">
+                                                <input type="radio" name="radio_color"> XL
+                                            </label>
+                                        </div> 
+                                    </div>
+                                </div> <!-- row.// -->
+                                <hr>
+
+                                {% if single_product.stock <= 0 %}
+                                <h5 class="text text-danger">Out of stock</h5>
+                                {% else %}
+                                    
+                                    {% if in_cart %}
+                                        <a href="#" class="btn btn-success"><span class="text">Added to cart</span> <i class="fas fa-check"></i>  </a>
+                                        <a href="{% url 'cart' %}" class="btn btn-outline-primary"><span class="text">View Cart</span> <i class="fas fa-eye"></i>  </a>
+                                    {% else %}
+                                        <button type="submit" class="btn btn-primary"><span class="text">Add to cart</span> <i class="fas fa-shopping-cart"></i></button>
+                                    {% endif %}
+
+                                {% endif %}
+                            </article> <!-- product-info-aside .// -->
+                        </form>
+                    </main> <!-- col.// -->
+                </div> <!-- row.// -->
+            </div> <!-- card.// -->
+        <!-- ============================ COMPONENT 1 END .// ================================= -->
         
-        <p>{{single_product.description}}</p>
-        
-        
-        <hr>
-        <hr>
-        {% if single_product.stock <= 0 %}
-        <h5 class="text text-danger">Out of stock</h5>
-        {% else %}
+            <br>
+            <div class="row">
+                <div class="col-md-9">
             
-            {% if in_cart %}
-                <a href="#" class="btn btn-success"><span class="text">Added to cart</span> <i class="fas fa-check"></i>  </a>
-                <a href="{% url 'cart' %}" class="btn btn-outline-primary"><span class="text">View Cart</span> <i class="fas fa-eye"></i>  </a>
-            {% else %}
-                <a href="{% url 'add_cart' single_product.id %}" class="btn btn-primary"><span class="text">Add to cart</span> <i class="fas fa-shopping-cart"></i>  </a>
-            {% endif %}
-
-        {% endif %}
-    </article> <!-- product-info-aside .// -->
-            </main> <!-- col.// -->
-        </div> <!-- row.// -->
-    </div> <!-- card.// -->
-    <!-- ============================ COMPONENT 1 END .// ================================= -->
-    
-    <br>
-    
-    <div class="row">
-        <div class="col-md-9">
-    
-            <header class="section-heading">
-                <h3>Customer Reviews </h3>  
-            </header>
-        
-            <article class="box mb-3">
-                <div class="icontext w-100">
-                    <img src="{% static './images/avatars/avatar1.jpg' %}" class="img-xs icon rounded-circle">
-                    <div class="text">
-                        <span class="date text-muted float-md-right">24.04.2020 </span>  
-                        <h6 class="mb-1">Mike John </h6>
-                        
-                    </div>
-                </div> <!-- icontext.// -->
-                <div class="mt-3">
-                    <p>
-                        Dummy comment Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
-                        tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
-                        quis nostrud exercitation ullamco laboris nisi ut aliquip
-                    </p>	
-                </div>
-            </article>
-        </div> <!-- col.// -->
-    </div> <!-- row.// -->
-    
-    
-    </div> <!-- container .//  -->
+                    <header class="section-heading">
+                        <h3>Customer Reviews </h3>  
+                    </header>
+                
+                    <article class="box mb-3">
+                        <div class="icontext w-100">
+                            <img src="{% static './images/avatars/avatar1.jpg' %}" class="img-xs icon rounded-circle">
+                            <div class="text">
+                                <span class="date text-muted float-md-right">24.04.2020 </span>  
+                                <h6 class="mb-1">Mike John </h6>
+                                
+                            </div>
+                        </div> <!-- icontext.// -->
+                        <div class="mt-3">
+                            <p>
+                                Dummy comment Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
+                                tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+                                quis nostrud exercitation ullamco laboris nisi ut aliquip
+                            </p>	
+                        </div>
+                    </article>
+                </div> <!-- col.// -->
+            </div> <!-- row.// -->
+        </div> <!-- container .//  -->
     </section>
 
-<script src="{% static './js/test1/zoom-image.js' %}"></script>
-<script src="{% static './js/test1/main.js' %}"></script>
+    <script src="{% static './js/test1/zoom-image.js' %}"></script>
+    <script src="{% static './js/test1/main.js' %}"></script>
+    
 {% endblock %}

@@ -21,9 +21,24 @@ urlpatterns = [
 # <--------------------------product-control-------------------------->
 
     path('products/', views.product_listing, name='products'),
-    path('product-management/e2d/<int:id>/',views.product_control, name='product_control'),
-    path('product-management/update-product/<int:id>/',views.product_update, name='product_update'),
+    path('product-management/e2d/<str:prod_slug>/',views.product_control, name='product_control'),
+    path('product-management/update-product/<str:prod_slug>/',views.product_update, name='product_update'),
     path('add-product/', views.add_product, name='add_product'),
+    
+    path("product/edit/variant/addnew/<slug:product_slug>/", views.add_product_variant, name="product-variant-add"),
+    path("product/edit/variant/<slug:product_variant_slug>/", views.product_variant_update, name="admin-product-variant-update"),
+    path("product/delete/variant/<slug:product_variant_slug>/", views.delete_product_variant, name="admin-product-variant-delete"),
+    path("product/delete/variant/<slug:product_variant_slug>/", views.delete_product_variant, name="admin-product-variant-delete"),
+    
+    # AJAX requests image updation
+    path("product/variant/update/additional-images/<slug:product_variant_slug>/", views.product_variant_update, name="admin_product_variant_update_ajax"),
+    
+    # Brand management
+    path("brand", views.all_brand, name="admin_all_brand"),
+    path("brand/create", views.create_brand, name="admin_brand_create"),
+    
+    # Ajax brand control
+    path("brand/brandcontrol/", views.brand_control, name="admin-brand-control"),
     
     
 # <--------------------------Category management-------------------------->

@@ -108,6 +108,13 @@
     transition: 0.3s ease all;
   }
 
+
+  .on-off-border{
+    border: 1px solid #fff ;
+    background-color: #fff;
+    border-radius: 10px;
+  }
+
   .side-bar-style{
     background-color: rgb(241, 241, 241);
   }
@@ -125,10 +132,15 @@
     background-color: rgb(241, 241, 241);
   }
 
-
-
-
-
   .coupon-bg{
-    background-color: rgb(221, 238, 221);
+    background-color: rgb(211, 211, 211);
+  }
+
+  .coupon-bg div{
+    background-color: #fff;
+  }
+
+  .image-form-custom{
+    width: 100px;
+    height: 100px;
   }

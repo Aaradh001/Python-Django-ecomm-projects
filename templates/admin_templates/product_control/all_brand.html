@@ -1,0 +1,54 @@
+{% extends 'admin_templates/base_admin.html' %}
+{% load static %}
+{% block content %}
+<div class="container">
+    {% include 'admin_templates/general/alerts.html' %}
+    <div class="p-2 bg-primary rounded"><h3 class=" text-white text-center">All Brands</h3></div>
+    <div class="table-responsive ">
+        <table class="table table-style-admin" id="all-brand-table">
+            <thead>
+                <tr>    
+                    <th scope="col">#</th>
+                    <th scope="col">Brand Name</th>
+                    <th scope="col">Active Status</th>
+                    <th scope="col">Brand control</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for brand in brands %}
+                    <tr>
+                        <th scope="row">{{forloop.counter}}</th>
+                        <td><a href="#">{{brand.brand_name}}</a></td>
+                        <td>
+                            {% if brand.is_active %}
+                              <img  src="{% static './images/icons/active_icon.svg' %}">  
+                            {% else %}
+                              <img src="{% static './images/icons/inactive_icon.svg' %}">  
+                            {% endif %}
+                            </td>
+                        <td>
+                            <div class="toggle-button-cover-random on-off-border">
+                                <div class="button-random r-random" id="button-1-random">
+                                  <input {% if brand.is_valid %} checked {% endif %} 
+                                  onclick="brand_control('{{brand.id}}');" type="checkbox" name="on_off" class="checkbox-random" {%if brand.is_active%} checked {% endif %}/>
+                                  <div class="knobs-random"></div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+  
+  
+<script>
+    $(document).ready(function () {
+        $('#all-brand-table').DataTable();
+    });
+</script>
+
+
+
+{% endblock %}

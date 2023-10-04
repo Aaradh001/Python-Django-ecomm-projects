@@ -5,6 +5,7 @@ urlpatterns = [
     
     path('signin/',views.user_signin, name='signin'),
     path('signup/',views.user_signup, name='user_signup'),
+    path('account-activation/<slug:uid>/<token>/',views.account_activation, name='account_activation'),
     path('signout/',views.signout, name='signout'),
     path('otp-login-user/', views.otp_generation, name='user_otp_login'),
     path('enter-otp-user/<str:uid>/', views.enter_otp, name='user_enter_otp'),
@@ -18,8 +19,9 @@ urlpatterns = [
     # Profile and order handling
     
     path('user/myaccount/', views.user_account, name='user_account'),
+    path('user/wallet/', views.my_wallet, name='my_wallet'),
     path('user/order-history/', views.order_history, name='order_history'),
-    path('user/order-history/<str:order_id>', views.order_history_detail, name='order-history-detail'),
+    path('user/order-history/<str:order_id>/', views.order_history_detail, name='order-history-detail'),
     
     # Order cancelling & return
     path("cancel/<str:order_id>/", views.order_cancel_user, name="order_cancel_user"),

@@ -1,0 +1,56 @@
+{% extends 'admin_templates/base_admin.html' %}
+{% load static %}
+{% block content %}
+<div class="container">
+    {% include 'admin_templates/general/alerts.html' %}
+    <div class="p-2 bg-primary rounded"><h3 class=" text-white text-center">All Attribute values</h3></div>
+    <div class="table-responsive">
+        <table class="table table-style-admin" id="all-brand-table">
+            <thead>
+                <tr>    
+                    <th scope="col">#</th>
+                    <th scope="col">Attribute</th>
+                    <th scope="col">Attribute value</th>
+                    <th scope="col">Active status</th>
+                    <th scope="col">Attribute value control</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for attribute_value in attribute_values %}
+                    <tr>
+                        <th scope="row">{{forloop.counter}}</th>
+                        <td><a href="#">{{attribute_value.attribute}}</a></td>
+                        <td><a href="#">{{attribute_value.attribute_value}}</a></td>
+                        <td>
+                            {% if attribute_value.is_active %}
+                              <img  src="{% static './images/icons/active_icon.svg' %}">  
+                            {% else %}
+                              <img src="{% static './images/icons/inactive_icon.svg' %}">  
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="toggle-button-cover-random on-off-border">
+                                <div class="button-random r-random" id="button-1-random">
+                                  <input {% if brand.is_valid %} checked {% endif %} 
+                                  onclick="attribute_value_control('{{attribute_value.id}}');" type="checkbox" name="on_off-attribute" class="checkbox-random" {%if attribute_value.is_active%} checked {% endif %}/>
+                                  <div class="knobs-random"></div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+  
+  
+<script>
+    $(document).ready(function () {
+        $('#all-brand-table').DataTable();
+    });
+</script>
+
+
+
+{% endblock %}

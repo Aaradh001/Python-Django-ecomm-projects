@@ -14,19 +14,20 @@ def get_wallet_grand_total(request):
         
         wallet = Wallet.objects.get(user=request.user,is_active=True)
         order = Order.objects.get(user=request.user,is_ordered=False,order_number=order_number)
-        grand_total = order.order_total
+        payable_total = order.order_total + order.tax
         wallet_balance = wallet.balance  
         
         if check=='true':  
-            if wallet.balance <= grand_total  :  
-                grand_total = grand_total- wallet.balance   
+            if wallet.balance <= payable_total  :  
+                payable_total = payable_total- wallet.balance   
                 wallet_balance = 0
             else:
-                wallet_balance = wallet.balance - grand_total
-                grand_total = 0
+                wallet_balance = wallet.balance - payable_total
+                payable_total = 0
+                print(payable_total)
                     
-            return JsonResponse({"status": "success", "grand_total":grand_total,"wallet_balance":wallet_balance})
+            return JsonResponse({"status": "success", "payable_total": payable_total, "wallet_balance": wallet_balance})
         else:
-            return JsonResponse({"status": "success", "grand_total":grand_total,"wallet_balance":wallet_balance})
+            return JsonResponse({"status": "success", "payable_total": payable_total, "wallet_balance": wallet_balance})
             
     

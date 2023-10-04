@@ -1,6 +1,6 @@
 from django.db import models
 from accounts.models import Account, AddressBook
-from store.models import Product
+from store.models import Product,ProductVariant
 from coupon_management.models import Coupon
 
 # Create your models here.
@@ -69,7 +69,7 @@ class OrderProduct(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE)
     payment = models.ForeignKey(Payment, on_delete=models.SET_NULL, blank=True, null = True)
     user = models.ForeignKey(Account, on_delete=models.SET_NULL,null=True)
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    product = models.ForeignKey(ProductVariant,on_delete=models.CASCADE)
     quantity = models.IntegerField()
     product_price = models.DecimalField(max_digits=12, decimal_places=2)
     ordered = models.BooleanField(default=False)

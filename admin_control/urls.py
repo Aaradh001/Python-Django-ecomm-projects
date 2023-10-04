@@ -37,8 +37,23 @@ urlpatterns = [
     path("brand", views.all_brand, name="admin_all_brand"),
     path("brand/create", views.create_brand, name="admin_brand_create"),
     
+    # Attribute management
+    path("variant-attribute/", views.all_attributes, name="admin_all_attributes"),
+    path("variant-attribute/create", views.create_attribute, name="admin_create_attribute"),
+
+    #atribute value management
+    path("variant-atribute_value", views.all_attribute_value, name="admin_all_attribute_value"),
+    path("variant-attribute_value/create", views.create_attribute_value, name="admin_attribute_value_create"),
+
+
     # Ajax brand control
     path("brand/brandcontrol/", views.brand_control, name="admin-brand-control"),
+
+    # Ajax attribute control
+    path("attribute/attributecontrol/", views.attribute_control, name="admin-attribute-control"),
+    
+    # Ajax attribute-value control
+    path("attribute-value/attribute-value-control/", views.attribute_value_control, name="admin-attribute-value-control"),
     
     
 # <--------------------------Category management-------------------------->

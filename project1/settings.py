@@ -168,7 +168,7 @@ EMAIL_HOST_PASSWORD = 'tzhirmkbfpgramxz'
 
 
 #For To Enable Popus in Django or else it will block the payment popup
-SECURE_CROSS_ORIGIN_OPENER_POLICY = "same-origin-allow-popups"
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field

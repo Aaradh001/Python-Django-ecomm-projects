@@ -2,6 +2,7 @@
 {% load static %}
 
 {% block content %}
+{% load humanize %}
 {% load static %}
 {% include 'includes/header.html' %}
 
@@ -80,7 +81,7 @@
                     <div class="form-check border border-dark my-2">
                         <div class="p-2">
                             
-                            <input value="{{ address.id }}" class="form-check-input" type="radio" name="address01" id="address{{ forloop.counter }}" {% if address.is_default %}checked{% endif %}>
+                            <input value="{{ address.id }}" class="form-check-input" type="radio" name="address" id="address{{ forloop.counter }}" {% if address.is_default %}checked{% endif %}>
                             <label class="form-check-label" for="address{{ forloop.counter }}">
                                 {{ address.get_user_full_address|slice:":80"|safe }}...
                             </label>
@@ -120,10 +121,16 @@
                                 <tr>
                                     <td>
                                         <figure class="itemside align-items-center">
-                                            <div class="aside"><img src="{{cart_item.product.images.url}}" class="img-sm"></div>
+                                            <div class="aside"><img src="{{cart_item.product.thumbnail_image.url}}" style="width: 80px;"></div>
                                             <figcaption class="info">
-                                                <a href="{{cart_item.product.get_url}}" class="title text-dark">{{cart_item.product.product_name}} {{cart_item.product.brand}}</a>
-                                                <p class="text-muted small">Matrix: 25 Mpx <br> Brand: {{cart_item.product.brand}}</p>
+                                                <a href="{{cart_item.product.get_url}}" class="title text-dark">{{cart_item.product.get_product_name}} {{cart_item.product.brand.brand_name}}</a>
+                                                <p class="text-muted small">
+                                                    {% for value in cart_item.product.attributes.all %}
+                                                        {{value.attribute}}: {{value.attribute_value}}
+                                                        <br>
+                                                    {% endfor %}
+                                                    Brand: {{cart_item.product.product.brand}}
+                                                </p>
                                             </figcaption>
                                         </figure>
                                     </td>
@@ -132,8 +139,8 @@
                                     </td>
                                     <td> 
                                         <div class="price-wrap"> 
-                                            <var class="price">&#8377;{{cart_item.subtotal}}</var> 
-                                            <small class="text-muted">&#8377; {{cart_item.product.price}} each </small> 
+                                            <var class="price">&#8377;{{cart_item.subtotal|intcomma}}</var> 
+                                            <small class="text-muted">&#8377; {{cart_item.product.product_price|intcomma}} each </small> 
                                         </div> <!-- price-wrap .// -->
                                     </td>
                                 </tr>
@@ -144,15 +151,21 @@
                     <div class="px-3">
                         <dl class="dlist-align">
                             <dt>Total price:</dt>
-                            <dd class="text-right">Rs {{ total }}</dd>
+                            <dd class="text-right">&#8377; {{ max_total|intcomma }}</dd>
                         </dl>
+
+                        <dl class="dlist-align">
+                            <dt>Discount:</dt>
+                            <dd class="text-right text-success">&#8377; {{discount|intcomma}}</dd>
+                        </dl>
+
                         <dl class="dlist-align">
                             <dt>Tax:</dt>
-                            <dd class="text-right text-danger">Rs {{ tax }}</dd>
+                            <dd class="text-right text-danger">&#8377; {{ tax|intcomma }}</dd>
                         </dl>
                         <dl class="dlist-align">
                             <dt>Grand Total:</dt>
-                            <dd class="text-right text-dark b"><strong> <span id="grand_total_checkout">Rs {{ grand_total }} </span> </strong></dd>
+                            <dd class="text-right text-dark b"><strong> <span id="grand_total_checkout">&#8377; {{ grand_total|intcomma }} </span> </strong></dd>
                         </dl>
                     </div>
                     <hr>

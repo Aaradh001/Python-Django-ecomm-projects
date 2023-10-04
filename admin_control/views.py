@@ -6,7 +6,7 @@ from django.urls import reverse
 from accounts.forms import UserRegistrationForm
 from category_management.forms import CategoryForm
 from category_management.models import Category
-from store.forms import ProductForm, ProductVariantForm, BrandForm
+from store.forms import ProductForm, ProductVariantForm, BrandForm, CreateAttributeValueForm, CreateAttributeForm
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.cache import cache_control
 import random
@@ -18,7 +18,8 @@ from coupon_management.forms import CouponForm
 from django.http import JsonResponse
 from django.db.models import OuterRef, Subquery
 import json
-
+import datetime
+from django.utils import timezone
 # Order management
 from orders.models import Order, OrderProduct, Payment
 from orders.forms import ChangeOrderStatusForm
@@ -67,8 +68,6 @@ def user_management(request):
     user = User.objects.all()
     context = {'user': user}
     return render(request, 'admin_templates/user_management.html', context)
-
-
 
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
@@ -751,3 +750,101 @@ def edit_coupon(request, id):
     context = {'form': form,'id': id}
     return render(request, 'admin_templates/coupon_management/coupon-edit.html', context)
 
+
+#===========ATRIBUTE MANAGEMENT==================
+
+def all_attributes(request):
+    
+    attributes = Attribute.objects.all()
+    context = {
+        'attributes': attributes,
+    }
+    return render(request, 'admin_templates/product_control/all_attributes.html',context)
+
+
+def create_attribute(request):
+    
+    form = CreateAttributeForm()
+    if request.method == 'POST':
+        form = CreateAttributeForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Attibute Created ")
+            return redirect('admin_all_attributes')
+        else:
+            context = {'form':form}
+            return render(request, 'admin_templates/product_control/create_attribute.html',context)
+        
+    context = {'form':form}
+    return render(request, 'admin_templates/product_control/create_attribute.html',context)
+
+
+@check_isadmin
+def attribute_control(request):
+    is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+    
+    if request.method == 'POST' and is_ajax:
+        data = json.load(request)
+        attribute_id = int(data['checkboxValue'])
+        try:
+            attribute = Attribute.objects.get(id = attribute_id)
+            attribute.is_active = not attribute.is_active
+            attribute.save()
+            return JsonResponse({
+                'status': 'success',
+                'attribute_status': attribute.is_active,
+                })
+        except Exception as e :
+            print(e)
+            return JsonResponse({"status": "error", "message": e })
+
+
+#===========ATRIBUTE VALUE MANAGEMENT==================
+
+def all_attribute_value(request):
+    
+    attribute_values = AttributeValue.objects.all()
+    context = {
+        'attribute_values': attribute_values,
+    }
+    return render(request, 'admin_templates/product_control/all_attribute_values.html',context)
+
+
+def create_attribute_value(request):
+    
+    form = CreateAttributeValueForm()
+    if request.method == 'POST':
+        form = CreateAttributeValueForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Attribute Value Created ")
+            return redirect('admin_all_attribute_value')
+        else:
+            context = {'form': form}
+            return render(request, 'admin_templates/product_control/create_attribute_value.html',context)
+        
+    context = {'form':form}
+    return render(request, 'admin_templates/product_control/create_attribute_value.html',context)
+    
+@check_isadmin
+def attribute_value_control(request):
+    is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+    
+    if request.method == 'POST' and is_ajax:
+        data = json.load(request)
+        attribute_value_id = int(data['checkboxValue'])
+        try:
+            attribute_value = AttributeValue.objects.get(id = attribute_value_id)
+            attribute_value.is_active = not attribute_value.is_active
+            attribute_value.save()
+            return JsonResponse({
+                'status': 'success',
+                'attribute_status': attribute_value.is_active,
+                })
+        except Exception as e :
+            print(e)
+            return JsonResponse({"status": "error", "message": e })
+        
+
+
+        

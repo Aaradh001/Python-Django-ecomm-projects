@@ -14,6 +14,7 @@
                 <a class="list-group-item {% if '/myaccount' in request.path %} active {% endif %}" href="{% url 'user_account' %}">Profile</a>
                 <a class="list-group-item {% if '/order-history' in request.path %} active {% endif %}" href="{% url 'order_history' %}">Order history</a>
                 <a class="list-group-item {% if '/myaddress' in request.path %} active {% endif %}" href="{% url 'my_address'%}">Addresses</a>
+                <a class="list-group-item {% if '/wallet' in request.path %} active {% endif %}" href="{% url 'my_wallet' %}">My Wallet</a>
                 <a class="list-group-item {% if '/wishlist' in request.path %} active {% endif %}" href="#">Wishlist</a>
             </ul>
             <br>

@@ -4,24 +4,14 @@
 {% block content %}
 {% include 'includes/header.html' %}
 {% load static %}
+{% load humanize %}
 <section class="section-content padding-y bg">
     <div class="container">
         
         <!-- ============================ COMPONENT 2 ================================= -->
         <div class="row">
             <main class="col-md-8">
-                
-                {% if messages %}
-                {% for message in messages %}
-                <div
-                  class="alert alert-dismissible fade show {% if message.tags == 'error' %} alert-danger {% else %} alert-dark {% endif %}"
-                  role="alert">
-                  <strong>{{message.tags|title}} !</strong> {{message}}
-                  <!-- <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button> -->
-                </div>
-            
-                {% endfor %}
-                {% endif %}
+                {% include 'includes/alerts.html' %}
                 <article class="card mb-4">
                     <div class="card-body">
                         <h4 class="card-title mb-4">Review cart</h4>
@@ -30,10 +20,18 @@
 
                             <div class="col-md-6">
                                 <figure class="itemside  mb-4">
-                                    <div class="aside"><img src="{{cart_item.product.images.url}}" class="border img-sm"></div>
-                                    <figcaption class="info">
-                                        <a href="{{cart_item.product.get_url}}" class="title text-dark">{{cart_item.product.product_name}} {{cart_item.product.brand}}</a>
-                                        <p class="text-muted small">Matrix: 25 Mpx <br> Brand: {{cart_item.product.brand}}</p>
+                                    <div class="aside"><img src="{{cart_item.product.thumbnail_image.url}}" style="width: 80px;" class="border"></div>
+                                    <figcaption class="info ">
+                                        <a href="{{cart_item.product.get_url}}" class="title text-dark m-0">{{cart_item.product.get_product_name}}</a>
+                                        <p class="text-muted small">
+                                            {% for value in cart_item.product.attributes.all %}
+                                                {{value.attribute}}: {{value.attribute_value}}
+                                                <br>
+                                            {% endfor %}
+                                            Brand: {{cart_item.product.product.brand.brand_name}}
+                                            <br>
+                                            Quantity: {{cart_item.qty}}
+                                        </p>
                                     </figcaption>
                                 </figure>
                             </div> <!-- col.// -->
@@ -127,7 +125,7 @@
                                         <input type="text" name="coupon_code" class="form-control" id="coupon_code">
                                     </div>
                                     <div class="col-4">
-                                        <button class="btn btn-primary" id="coupon_btn">Apply</button>
+                                        <button type="button" class="btn btn-primary" onclick="couponApplyOrRemove('apply_coupon')" id="coupon_btn">Apply</button>
                                     </div>
                                     
                                 </div>
@@ -136,7 +134,7 @@
                                 <button id="coupon-applied-btn"  class="btn btn-success text-capitalize">
                                     Coupon Value
                                 </button>
-                                <a href="" class="text-decoration-none text-danger" onClick="window.location.reload()">
+                                <a class="text-decoration-none text-danger" onClick="couponApplyOrRemove('remove_coupon')">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-square" viewBox="0 0 20 20">
                                     <path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"></path>
                                     <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"></path>
@@ -182,28 +180,27 @@
                         </div>
                     </div> <!-- end coupons Modal -->
 
-
-
-                    
-
-
                     <div class="card">
                         <div class="card-body">
                             <dl class="dlist-align">
                                 <dt>Total price:</dt>
-                                <dd class="text-right">&#8377;{{total}}</dd>
+                                <dd class="text-right">&#8377;{{max_total}}</dd>
                             </dl>
                             <dl class="dlist-align">
-                                <dt>Tax:</dt>
-                                <dd class="text-right"> &#8377;{{tax}}</dd>
-                            </dl>
-                            <dl class="dlist-align">
-                                <dt>Grand Total:</dt>
-                                <dd class="text-right text-dark b"><strong>&#8377;{{grand_total}}</strong></dd>
+                                <dt>Price discount:</dt>
+                                <dd class="text-right text-success">&#8377;{{discount}}</dd>
                             </dl>
                             <dl class="dlist-align">
                                 <dt>Coupon Discount:</dt>
                                 <dd class="text-right text-success" id="coupon_discount"><strong>&#8377;0</strong></dd>
+                            </dl>
+                            <dl class="dlist-align">
+                                <dt>Grand Total:</dt>
+                                <dd id="grand_total_update" class="text-right text-dark b"><strong>&#8377;{{grand_total}}</strong></dd>
+                            </dl>
+                            <dl class="dlist-align">
+                                <dt>Tax:</dt>
+                                <dd id="tax" class="text-right text-danger"> &#8377;{{tax}}</dd>
                             </dl>
                             <hr>
                             <dl class="dlist-align">
@@ -221,7 +218,7 @@
                             <hr>
                             <dl class="dlist-align mb-4">
                                 <dt>Payable amount:</dt>
-                                <dd class="text-right text-dark b" id="grand_total_update"><strong>&#8377;{{grand_total}}</strong></dd>
+                                <dd class="text-right text-dark b" id="payable_amount_update"><strong>&#8377;{{payable_total}}</strong></dd>
                             </dl>
                             <hr>
                             <p class="text-center mb-3">
@@ -246,6 +243,21 @@
 
 <!-- ========================= SECTION CONTENT END// ========================= -->
 <script>
+    function getCookie(name) {
+        var cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
     var btn = $('#payment-form-btn');
     btn.on('click', function(e){
         try {
@@ -271,24 +283,44 @@
     //     $('#payment-method-error').fadeOut('slow')
     // }, 3000)
 
-    var btn = $('#coupon_btn');
-    btn.on('click', function(e){
-        e.preventDefault();
-        document.getElementById('coupon-applied').classList.add('d-none')
-        document.getElementById('couponError').innerText=''
-        var coupon_code = $('#coupon_code').val();
-        if (!coupon_code){
-            document.getElementById('couponError').innerText = 'Enter a valid coupon code !'
-            return
+    function couponApplyOrRemove(action){
+        if (action === 'remove_coupon'){
+            document.getElementById('coupon-applied').classList.add('d-none')
+            document.getElementById('coupon-not-applied').classList.remove('d-none')
+            var coupon_code = document.getElementById('coupon_code').value
+            document.getElementById('coupon_code').value = ''
+            data = {
+                action: action,
+                coupon_code : coupon_code,
+                order_number : '{{order.order_number}}'
+            }
+
+            init_ajax(data);
+            
+        }else{
+            document.getElementById('coupon-applied').classList.add('d-none')
+            document.getElementById('couponError').innerText=''
+            var coupon_code = $('#coupon_code').val();
+
+            if (!coupon_code){
+                document.getElementById('couponError').innerText = 'Enter a valid coupon code !'
+                return
+            }
+            // var is_wallet = document
+            
+            var data = {
+                action: action,
+                coupon_code : coupon_code,
+                order_number : '{{order.order_number}}'
+            };
+            init_ajax(data);
         }
+        
+    }
+    
+    function init_ajax(data) {
+
         var url = 'coupon/verify/'
-        // var is_wallet = document
-
-        var data = {
-            coupon_code : coupon_code,
-            order_number : '{{order.order_number}}'
-        };
-
         $.ajax({
             type: "POST",
             url: url,  // Replace with the actual URL for your view
@@ -310,15 +342,31 @@
                 document.getElementById('coupon-applied').classList.remove('d-none')
                 document.getElementById('coupon-not-applied').classList.add('d-none')
                 document.getElementById('coupon-applied-description').innerText = data.message
-                document.getElementById('coupon-applied-btn').innerText = coupon_code
+                document.getElementById('coupon-applied-btn').innerText = data.coupon_code
 
-                document.getElementById('coupon_discount').innerText = 'Rs'+ data.coupon_discount
+                document.getElementById('coupon_discount').innerHTML = '&#8377;'+ data.coupon_discount
 
-                var new_grand_total = data.grand_total
-                document.getElementById('grand_total_update').innerText = 'Rs'+ new_grand_total
+                document.getElementById('payable_amount_update').innerHTML = '&#8377;'+ data.payable_total
+                document.getElementById('grand_total_update').innerHTML = '&#8377;'+ data.grand_total
+                document.getElementById('tax').innerHTML = '&#8377;'+ data.tax
                 
-
-            } else {
+                
+            } else if(data.status === "coupon_removed"){
+                if (document.getElementById('wallet_balance').checked){
+                    console.log("pressed")
+                    document.getElementById('wallet_balance').checked = false
+                    wallet_balance_add();
+                }
+                document.getElementById('coupon_discount').innerHTML = '&#8377;'+ data.coupon_discount
+                document.getElementById('grand_total_update').innerHTML = '&#8377;'+ data.grand_total
+                document.getElementById('tax').innerHTML = '&#8377;'+ data.tax
+                document.getElementById('payable_amount_update').innerHTML = '&#8377;'+ data.payable_total
+                document.getElementById('couponError').innerText = data.message
+                
+            }
+            
+            
+            else{
                 // Password change error
                 console.log(data);
                 document.getElementById('couponError').innerText = data.message
@@ -331,11 +379,9 @@
                 console.log("error");
                 console.log(error);
             }
-            });
-
-    });
-
-
+        });
+    }
+    
 
 
 

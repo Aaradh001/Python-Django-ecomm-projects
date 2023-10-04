@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.shortcuts import render, redirect
+from django.http import HttpResponse
 from django.contrib.auth import authenticate, login, logout
 from accounts.forms import UserRegistrationForm, AddressBookForm, UserProfilePicForm
 from django.views.decorators.cache import cache_control
@@ -46,6 +47,7 @@ def user_signin(request):
     if request.method == 'POST':
         raw_email = request.POST.get("email")
         password = request.POST.get("password")
+
         email = raw_email.lower().strip()
 
         check_if_user_exists = User.objects.filter(email=email).exists()
@@ -53,8 +55,17 @@ def user_signin(request):
         if not check_if_user_exists:
             messages.error(request, 'Invalid username')
             return render(request, 'signin.html')
+        try:
+            user = User.objects.get(email = email)
+        except Exception as e:
+            print(e)
+        is_valid_password = user.check_password(password)
+        if not is_valid_password:
+            messages.error(request, 'Invalid password')
+            return render(request, 'signin.html')
         
         user = authenticate(email = email, password = password)
+
 
         if user is not None:
             try:
@@ -89,11 +100,10 @@ def user_signin(request):
             except:
                 return redirect('user_home')
         else:
-            messages.error(request, "Invalid password")
+            messages.error(request, "Account activation pending!\nKindly check your mailbox for account activation mail.")
             return redirect('signin')
         
     return render(request, 'signin.html')
-
 
 
 def user_signup(request):
@@ -105,13 +115,14 @@ def user_signup(request):
         form = UserRegistrationForm(request.POST)
         password = request.POST.get('password')
         confirm_password = request.POST.get('confirm-password')
+        context = {'form': form}
         
+        if not password:
+            messages.error(request, 'Password cannot be blank')
+            return render(request, 'user_signup.html',context)
         
         if password != confirm_password:
             messages.error(request, "passwords not matching")
-            context = {
-                'form': form
-            }
             return render(request, 'user_signup.html',context)
 
         if form.is_valid():
@@ -129,8 +140,24 @@ def user_signup(request):
                 )
             
             UserProfile.objects.create(user = user)
-            messages.success(request, 'Registration successfull')
-            return redirect('user_home')
+            
+            current_site = get_current_site(request)
+            mail_subject = "You're almost done! Activate your HarmonicHut account now"
+            data = {
+                'user': user,
+                'domain': current_site,
+                'uid': urlsafe_base64_encode(force_bytes(user.pk)),
+                'token': default_token_generator.make_token(user),
+                }
+            message = render_to_string('accounts_templates/account_activation_link.html', data)
+            to_email = email
+            send_email = EmailMessage(mail_subject,message, to=[to_email])
+            send_email.content_subtype = 'html'
+            send_email.send()
+
+            messages.success(request, f'Registration successfull! A verification email has been sent to: {email}. Open this email and click the link to activate your account')
+            return redirect('signin')
+
         else:
             context = {
                 'form' : form
@@ -139,6 +166,30 @@ def user_signup(request):
     else:
         form = UserRegistrationForm()
     return render(request, 'user_signup.html', {'form': form})
+
+
+
+def account_activation(request, uid, token):
+    try:
+        uid = urlsafe_base64_decode(uid).decode()
+        user = User._default_manager.get(pk = uid)
+    except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+        user = None
+        
+    if user is not None and default_token_generator.check_token(user, token):
+        user.is_active = True
+        user.save()
+        messages.success(request, 'Congratulations! Your account has beeen activated')
+        return redirect('signin')
+    else:
+        return HttpResponse('This link has been expired. Click <a href="http://127.0.0.1:8000/">Home </a>to go back')
+
+
+
+
+
+
+
 
 
 def otp_generation(request):
@@ -217,7 +268,7 @@ def my_address(request):
         'address_form': address_form,
     }
     return render(request, 'myaddresses.html', context)
-    
+
 
 @login_required(login_url = 'signin')
 def add_address(request, source):
@@ -238,7 +289,6 @@ def add_address(request, source):
                 }
             return render(request, 'myaddresses.html', context)
     
-    
 @login_required(login_url = 'signin')
 def default_address(request, id):
     try:  
@@ -248,8 +298,7 @@ def default_address(request, id):
         return redirect('my_address')
     except AddressBook.DoesNotExist:
         return redirect('my_address')
-    
-    
+        
 @login_required(login_url = 'signin')
 def address_delete(request, id):
     try:  
@@ -261,7 +310,6 @@ def address_delete(request, id):
         return redirect('my_address')
 
 # <---------------Address management end----------------->
-
 
 # <---------------Order management user----------------->
 @login_required(login_url='signin')
@@ -280,6 +328,8 @@ def order_history(request):
 
 @login_required(login_url = 'signin')
 def order_history_detail(request, order_id):
+    print("hiiiiiiiiiiiiiii")
+    print(order_id)
     try:
         order = Order.objects.get(user=request.user, order_number=order_id)
         order_products = OrderProduct.objects.filter(user=request.user, order=order)
@@ -356,6 +406,22 @@ def order_return_user(request, order_id):
         return redirect('order-history-detail', order_id=order.order_number)
     else:
         return redirect('order-history-detail', order_id=order.order_number)
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 # <----------------Forgot password----------------->
 def forgot_password(request):
@@ -541,7 +607,7 @@ def change_email_with_email(request):
             return JsonResponse({"status": "error", "message": 'Entered email is same as current email'})
         
         try:
-            user = User.objects.get(email=request.user.email)
+            user = User.objects.get(email = request.user.email)
             #SEND OTP TO MAIL
             otp=random.randint(1000,9999)
             user_otp,created = UserProfile.objects.update_or_create(user=user, defaults={'otp': f'{otp}'})
@@ -638,3 +704,14 @@ def my_orders(request):
         }
     return render(request, 'myorders.html', context)
 
+
+
+
+def my_wallet(request):
+    wallet = Wallet.objects.get(user=request.user, is_active=True)
+    wallet_transactons = WalletTransaction.objects.filter(wallet = wallet)
+    context = {
+        'wallet': wallet,
+        'wallet_transactions': wallet_transactons,
+    }
+    return render(request, 'accounts_templates/my_wallet.html', context)

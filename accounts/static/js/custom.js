@@ -411,7 +411,6 @@ function wallet_balance_add()
 {
   if (document.getElementById('wallet_balance').checked) 
   {
-      console.log("hiiiii");
       document.getElementById('wallet_balance').value = 1
       get_wallet_grand_total(document.getElementById('order_number_order_summary').value)
 
@@ -443,9 +442,9 @@ function get_wallet_grand_total(order_number,check=true)
     success: (data) => {
       if (data.status === "success") {
         console.log(data);
-        document.getElementById('wallet_updated_balance').innerHTML = data.wallet_balance
-        document.getElementById('grand_total_update').innerHTML     = data.grand_total
-        if (data.grand_total == 0)
+        document.getElementById('wallet_updated_balance').innerHTML = '&#8377;'+ data.wallet_balance
+        document.getElementById('payable_amount_update').innerHTML     = '&#8377;'+ data.payable_total
+        if (data.payable_total === 0)
         {
           document.getElementById('id_payment_div_RAZORPAY').disabled = true
           document.getElementById('id_payment_div_COD').disabled      = true

@@ -108,3 +108,48 @@ function send_data(inputid, variant_slug, image_id='thumbnail') {
           }
     });
 }
+
+
+function attribute_control(brand_id){
+
+  let checkboxValue = brand_id;
+  console.log(checkboxValue)
+  $.ajax({
+      type: 'POST',
+      url: `/admin-control/attribute/attributecontrol/`,
+      headers: {
+        "X-CSRFToken": csrftoken
+      },
+
+      data: JSON.stringify({checkboxValue: checkboxValue,}),
+      success: (data) => {
+        console.log(data)
+      },
+      error: (error) => {
+          console.log(error);
+        }
+  });
+}
+function attribute_value_control(attribute_value_id){
+
+  let checkboxValue = attribute_value_id;
+  console.log(checkboxValue)
+  $.ajax({
+      type: 'POST',
+      url: `/admin-control/attribute-value/attribute-value-control/`,
+      headers: {
+        "X-CSRFToken": csrftoken
+      },
+
+      data: JSON.stringify({checkboxValue: checkboxValue,}),
+      success: (data) => {
+        console.log(data)
+      },
+      error: (error) => {
+          console.log(error);
+        }
+  });
+}
+
+
+

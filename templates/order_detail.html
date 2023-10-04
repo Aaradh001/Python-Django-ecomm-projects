@@ -1,4 +1,5 @@
 {% extends 'user_account.html' %}
+{% load humanize %}
 {% load static %}
 
 {% block inner_content %}
@@ -20,12 +21,13 @@
                 <div class="row"> 
                     <div class="col-md-8">
                         <h6 class="text-muted">Delivery to</h6>
-                        <p>Name: {{order.shipping_address.name}}<br> 
-                        Phone: {{order.shipping_address.phone}}<br>
-                        Address: {{order.shipping_address.address_line_1}}, <br>
-                        {{order.shipping_address.address_line_2}},<br>
-                        PIN: {{order.shipping_address.pincode}}, {{order.shipping_address.city}},<br>
-                        {{order.shipping_address.state}}, {{order.shipping_address.country}}
+                        <p>
+                            Name: {{order.shipping_address.name}}<br> 
+                            Phone: {{order.shipping_address.phone}}<br>
+                            Address: {{order.shipping_address.address_line_1}}, <br>
+                            {{order.shipping_address.address_line_2}},<br>
+                            PIN: {{order.shipping_address.pincode}}, {{order.shipping_address.city}},<br>
+                            {{order.shipping_address.state}}, {{order.shipping_address.country}}
                          </p>
                     </div>
                     <div class="col-md-4">
@@ -53,14 +55,15 @@
                 {% for order_product in order_products %}
                 <tr>
                     <td width="65">
-                        <img src="{{order_product.product.images.url}}" class="img-xs border">
+                        <img src="{{order_product.product.thumbnail_image.url}}" class="border" style="width: 50px;">
                     </td>
                     <td> 
-                        <p class="title mb-0">{{order_product.product.product_name}}</p>
+                        <p class="title mb-0">{{order_product.product.get_product_name}}</p>
                         <var class="price text-muted">&#8377; {{order_product.product_price}}</var>
                     </td>
-                    <td> Brand <br> {{order_product.product.brand}} </td>
-                    <td> Type <br> {{order_product.product.category.category_name}} </td>
+                    <td> Brand <br><br> {{order_product.product.product.brand}} </td>
+                    <td> Quantity <br><br> {{order_product.quantity}} </td>
+                    <td> Type <br><br> {{order_product.product.product.category.category_name}} </td>
                 </tr>
                 {% endfor %}
             </table>

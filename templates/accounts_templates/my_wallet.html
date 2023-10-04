@@ -1,0 +1,82 @@
+{% extends 'user_account.html' %}
+{% load static %}
+
+{% block inner_content %}
+
+    
+    <main class="col-md-9">
+        <article class="card">
+            <header class="card-header" style="background-color: #f3f5ed;">
+                <div class="row text-secondary">
+                    
+                <div class="col-md-7 col-sm-12 py-3">
+                    <div class="card-body py-2" >
+                        <dl class="dlist-align m-0">
+                            <dt><strong>Account holder:</strong></dt>
+                            <dd class="text-left">{{wallet.user.full_name}}</dd>
+                        </dl>
+                        <dl class="dlist-align m-0">
+                            <dt><strong>Wallet balance</strong>:</dt>
+                            <dd class="text-left"> &#8377;{{wallet.balance}}</dd>
+                        </dl>
+                    </div>
+                </div>
+                <div class="col-md-5 col-sm-12">
+                    <div class="card-body py-1 float-right px-5">
+                        <i class='fas fa-wallet' style='font-size:80px; color:#272525'>
+                            <!-- <span style="font-family: 'Young Serif', serif;">Wallet</span> -->
+                        </i>
+                    </div>
+                </div>
+                    <!-- <div class="col-4">
+                        <p><strong>Account holder:</strong></p>
+                        <p><strong>Wallet balance:</strong></p>
+                    </div>
+                    <div class="col-8 text-align-left">
+                        <strong>Aaradh KM</strong>
+                    </div> -->
+
+                </div>
+            </header>
+            <div class="card-body">
+                <div class="row"> 
+                    <div class="p-2">
+                        <h6 class="text-center">Transaction history</h6>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover" id="wallet-transaction-table">
+                            <thead>
+                                <tr>    
+                                    <th scope="col">#</th>
+                                    <th scope="col">Transaction type</th>
+                                    <th scope="col">Transaction date</th>
+                                    <th scope="col">Order details</th>
+                                    <th scope="col">Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for transaction in wallet_transactions %}
+                                    <tr>
+                                        <th scope="row">{{forloop.counter}}</th>
+                                        <td class="{% if transaction.transaction_type == 'DEBIT' %}text-danger{% elif transaction.transaction_type == 'CREDIT' %}text-success{% endif %}" >
+                                            {{transaction.transaction_type}}
+                                        </td>
+                                        <td>{{transaction.created_at}}</td>
+                                        <td><a href="{% url 'order-history-detail' 'transaction.order.order_number' %}">{{transaction.order.order_number}}</a></td>
+                                        <td><a href="#">{{transaction.amount}}</a></td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div> <!-- row.// -->
+            </div> <!-- card-body .// -->
+        </article> <!-- order-group.// --> 
+    </main>
+    <script>
+        $(document).ready(function () {
+            $('#wallet-transaction-table').DataTable();
+        });
+    </script>
+    
+{% endblock %}

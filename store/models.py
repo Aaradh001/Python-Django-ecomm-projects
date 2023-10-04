@@ -107,10 +107,27 @@ class ProductVariant(models.Model):
         
         
     def get_url(self):
-        return reverse('product-variant-detail',args=[self.product.category.cat_slug,self.product_variant_slug])
+        return reverse('product_variant_detail',args=[self.product.category.cat_slug,self.product_variant_slug])
     
     def get_product_name(self):
-        return f'{self.product.brand} {self.product.product_name}-{self.sku_id} - {", ".join([value[0] for value in self.attributes.all().values_list("attribute_value")])}'
+        return f'{self.product.brand} {self.product.product_name}-{self.sku_id} - ({", ".join([value[0] for value in self.attributes.all().values_list("attribute_value")])},{self.product.category.category_name})'
+
+    def product_price(self):
+        offer_percentage=0
+       
+        # #adding catggry offer
+        # if self.product.product_catg.categoryoffer_set.filter(is_active=True, expire_date__gte=datetime.now()).exists():
+        #         offer_percentage = self.product.product_catg.categoryoffer_set.filter(is_active=True, expire_date__gte=datetime.now()).values_list('discount_percentage', flat=True).order_by('-discount_percentage').first()
+        
+        # #adding product offer
+        # if self.productoffer_set.filter(is_active=True, expire_date__gte=datetime.now()).exists():
+        #         offer_percentage = offer_percentage+self.productoffer_set.filter(is_active=True, expire_date__gte=datetime.now()).values_list('discount_percentage', flat=True).order_by('-discount_percentage').first()
+        
+        # if offer_percentage >=100:
+        #     offer_percentage = 100
+         
+        offer_price =  self.sale_price - self.sale_price * (offer_percentage) / (100)
+        return offer_price
 
 
 class ProductImage(models.Model):
@@ -119,6 +136,7 @@ class ProductImage(models.Model):
 
     def __str__(self):
         return self.image.url
+    
 
 
 

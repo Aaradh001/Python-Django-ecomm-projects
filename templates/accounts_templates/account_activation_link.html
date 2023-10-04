@@ -1,0 +1,70 @@
+{% autoescape off %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat&display=swap" rel="stylesheet">
+    <title>Hello {{request.user.first_name}}, Your OTP For Changing Password</title>
+    <style>
+        body{
+            font-family: 'Montserrat', sans-serif; 
+        }
+        .format-font {
+            font-family: 'Montserrat', sans-serif; 
+        }
+
+        .my-container {
+            margin: 10px;
+            background: linear-gradient(to bottom, #ff00ff, #00ffff);
+            padding: 10px;
+            padding-top: 0px;
+            justify-content: center;
+            background-color: burlywood;
+            border-radius: 5px;
+            border: 1px solid rgb(204, 203, 203);
+        }
+
+        .my-button {
+            padding: 10px;
+            padding-left: 35px;
+            padding-right: 35px;
+            background-color: rgba(255, 255, 255, 0.3);
+            color: #000;
+            border-radius: 25px;
+            transition-duration: 500ms;
+            text-decoration: none;
+            
+        }
+        .my-button:hover {
+            color: #fff;
+            background-color: #000;
+            border-radius: 5px;
+            border: 1px solid #fff;
+            transition-duration: 1000ms;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="my-container">
+        <p style="font-weight: 600">
+                Hi <strong>{{user.full_name}}</strong>,<br>
+                Congratulations on creating your new HarmonicHut account. You've just taken a big step into the world of accoustic revolution. <br> <br>
+        </p>
+        <h5 style="margin-bottom: 50px;" class="format-font">Click on the 'activate' button below to activate your HarmonicHut account</h5>
+        <a type="button" class="my-button" href="http://{{domain}}{% url 'account_activation' uid=uid token=token  %}" class="btn btn-dark">
+                Activate
+        </a>
+        <hr style="background-color:  rgb(161, 157, 163); height: 4px; margin-top: 40px;">
+        
+        
+            
+
+    </div>
+   
+</body>
+</html>
+
+{% endautoescape %}

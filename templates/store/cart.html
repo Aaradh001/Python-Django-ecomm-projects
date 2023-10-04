@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
-
+{% load humanize %}
 {% block content %}
 {% load static %}
 {% include 'includes/header.html' %}
@@ -32,10 +32,16 @@
                         <tr>
                             <td>
                                 <figure class="itemside align-items-center">
-                                    <div class="aside"><img src="{{cart_item.product.images.url}}" class="img-sm"></div>
+                                    <div class="aside"><img style="width: 80px;" src="{{cart_item.product.thumbnail_image.url}}"></div>
                                     <figcaption class="info">
-                                        <a href="{{cart_item.product.get_url}}" class="title text-dark">{{cart_item.product.product_name}} {{cart_item.product.brand}}</a>
-                                        <p class="text-muted small">Matrix: 25 Mpx <br> Brand: {{cart_item.product.brand}}</p>
+                                        <a href="{{cart_item.product.get_url}}" class="title text-dark">{{cart_item.product.get_product_name}} {{cart_item.product.brand}}</a>
+                                        <p class="text-muted small">
+                                            {% for value in cart_item.product.attributes.all %}
+                                            {{value.attribute}}: {{value.attribute_value}}
+                                            <br>
+
+                                            {% endfor %}
+                                            Brand: {{cart_item.product.product.brand}}</p>
                                     </figcaption>
                                 </figure>
                             </td>
@@ -55,8 +61,8 @@
                             </td>
                             <td> 
                                 <div class="price-wrap"> 
-                                    <var class="price">&#8377;{{cart_item.subtotal}}</var> 
-                                    <small class="text-muted">&#8377; {{cart_item.product.price}} each </small> 
+                                    <var class="price">&#8377;{{cart_item.subtotal|intcomma}}</var> 
+                                    <small class="text-muted">&#8377; {{cart_item.product.product_price|intcomma}} each </small> 
                                 </div> <!-- price-wrap .// -->
                             </td>
                             <td class="text-right"> 
@@ -74,16 +80,20 @@
                 <div class="card">
                     <div class="card-body">
                         <dl class="dlist-align">
-                            <dt>Total price:</dt>
-                            <dd class="text-right">&#8377; {{total}}</dd>
+                            <dt>Price: <small>({{cart_items.count}} item)</small></dt>
+                            <dd class="text-right">&#8377;{{max_total|intcomma}}</dd>
+                        </dl>
+                        <dl class="dlist-align">
+                            <dt>Discount:</dt>
+                            <dd class="text-right text-success">&#8377;{{discount|intcomma}}</dd>
                         </dl>
                         <dl class="dlist-align">
                             <dt>Tax:</dt>
-                            <dd class="text-right">&#8377; {{tax}}</dd>
+                            <dd class="text-right text-danger">&#8377;{{tax|intcomma}}</dd>
                         </dl>
                         <dl class="dlist-align">
-                            <dt>Total:</dt>
-                            <dd class="text-right text-dark b"><strong>&#8377; {{grand_total}}</strong></dd>
+                            <dt>Total Amount:</dt>
+                            <dd class="text-right text-dark b"><strong>&#8377; {{grand_total|intcomma}}</strong></dd>
                         </dl>
                         <hr>
                         <p class="text-center mb-3">

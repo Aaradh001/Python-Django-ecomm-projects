@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block content %}
+{% include 'includes/header.html' %}
+
+<!-- ========================= SECTION CONTENT ========================= -->
+<section class="section-conten" style="min-height:84vh">
+{% include 'includes/alerts.html' %}
+	<!-- ============================ COMPONENT LOGIN   ================================= -->
+	<div class="card mx-auto" style="max-width: 380px; margin-top:50px;">
+		<div class="card-body">
+			<h4 class="card-title mb-4">Sign in</h4>
+			<form method="post">
+				{% csrf_token %}
+				
+				<div class="form-group">
+					<!-- <input type="email" class="form-control" placeholder="Email Address" > -->
+					<label for="exampleInputEmail1" class="form-label fw-bold text-dark">Email</label>
+					<input type="email" name="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
+				</div>
+		  <!-- form-group// -->
+          <div class="form-group">
+			<label for="exampleInputPassword1" class="form-label text-dark">Password</label>
+			<input type="password" name="password" class="form-control" id="exampleInputPassword1">
+          </div>
+		  <!-- form-group// -->
+          
+          <div class="form-group">
+			<a class="text-primary fw-bold" href="{% url 'user_otp_login' %}">Login with otp</a>
+          	<a href="{% url 'forgot_password' %}" class="float-right">Forgot password?</a>  
+          </div>
+		  <!-- form-group form-check .// -->
+          <div class="form-group">
+              <button type="submit" class="btn btn-primary btn-block"> Login  </button>
+          </div>
+		  <!-- form-group// -->    
+      </form>
+      </div> <!-- card-body.// -->
+    </div> <!-- card .// -->
+
+     <p class="text-center mt-4">Don't have account? <a href="{% url 'user_signup' %}">Sign up</a></p>
+     <br><br>
+<!-- ============================ COMPONENT LOGIN  END.// ================================= -->
+
+
+</section>
+<!-- ========================= SECTION CONTENT END// ========================= -->
+
+
+<!-- ========================= FOOTER ========================= -->
+<footer class="section-footer border-top padding-y">
+	<div class="container">
+		<p class="float-md-right"> 
+			&copy Copyright 2019 All rights reserved
+		</p>
+		<p>
+			<a href="#">Terms and conditions</a>
+		</p>
+	</div><!-- //container -->
+</footer>
+<!-- ========================= FOOTER END // ========================= -->
+
+{% endblock %}

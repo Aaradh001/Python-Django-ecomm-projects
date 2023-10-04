@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
-
+{% load humanize %}
 {% block content %}
 {% include 'includes/header.html' %}
 
@@ -75,7 +75,7 @@
                             <div class="product-image" >
                                 <div class="shows">
                                     <div class="d-flex justify-content-center">
-                                        <img src="{{single_product.images.url}}" id="show-img">
+                                        <img src="{{single_product.thumbnail_image.url}}" id="show-img">
                                     </div>
                                 </div>
                             </div>
@@ -85,9 +85,9 @@
                                 <img src="{% static './images/test1/next-icon.png' %}" class="icon-left" alt="" id="prev-img">
                                     <div class="small-container">
                                         <div id="small-img-roll">
-                                            <img src="{{single_product.images.url}}" class="show-small-img" alt="">
+                                            <img src="{{single_product.thumbnail_image.url}}" class="slideshow-thumbnails show-small-img" alt="">
                                             {% for add_image in add_images %}
-                                            <img src="{{add_image.image.url}}" class="show-small-img" alt="">
+                                            <img src="{{add_image.image.url}}" class="slideshow-thumbnails show-small-img" alt="">
                                             {% endfor %}
                                         </div>
                                     </div>
@@ -101,57 +101,62 @@
                         <form action="{% url 'add_cart' single_product.id %}" method="GET">
                             {% csrf_token %}
                             <article class="content-body">
-                                <h2 class="title">{{single_product.brand}} {{single_product.product_name}} {{single_product.category}}</h2>
-                                <div class="mb-3"> 
-                                    <var class="price h4">&#8377; {{single_product.price}}</var> 
-                                </div> 
-                                <p>{{single_product.description}}</p>
-                                <hr>
                                 <div class="row">
-                                    <div class="item-option-select">
-                                        <h6>Choose Color</h6>
-                                        <select name="color" id="" class="form-control">
-                                            <option value="red">Red</option>
-                                            <option value="blue">Blue</option>
-                                            <option value="green">Green</option>
-                                            <option value="white">White</option>
-                                            <option value="black">Black</option>
-                                        </select> 
+                                    <div class="col-12">
+                                        <h5 class="title">{{single_product.get_product_name}}</h5>
+                                        <hr>
                                     </div>
-                                </div> <!-- row.// -->
-                                <div class="row">
-                                    <div class="item-option-select">
-                                        <h6>Select Size</h6>
-                                        <div class="btn-group btn-group-sm btn-group-toggle" data-toggle="buttons">
-                                            <label class="btn btn-light">
-                                                <input type="radio" name="radio_color"> S
-                                            </label>
-                                            <label class="btn btn-light active">
-                                                <input type="radio" name="radio_color" checked> M
-                                            </label>
-                                            <label class="btn btn-light">
-                                                <input type="radio" name="radio_color"> L
-                                            </label>
-                                            <label class="btn btn-light">
-                                                <input type="radio" name="radio_color"> XL
-                                            </label>
-                                        </div> 
+                                    <div class="col-12 mb-3"> 
+                                        <del class="price-old">&#8377; {{ single_product.max_price|intcomma }}</del>
+                                        <var class="price h5">&#8377; {{single_product.product_price|intcomma}}</var>
                                     </div>
-                                </div> <!-- row.// -->
-                                <hr>
+                                    <div class="col-12">
+                                        <p>{{single_product.product.description}}</p>
+                                    </div>
+                                    {% for value in single_product.attributes.all %}
+                                    <div class="col-12 d-block">
+                                        <div class="text-left">
+                                            <div class="col-6">
 
-                                {% if single_product.stock <= 0 %}
-                                <h5 class="text text-danger">Out of stock</h5>
-                                {% else %}
-                                    
-                                    {% if in_cart %}
-                                        <a href="#" class="btn btn-success"><span class="text">Added to cart</span> <i class="fas fa-check"></i>  </a>
-                                        <a href="{% url 'cart' %}" class="btn btn-outline-primary"><span class="text">View Cart</span> <i class="fas fa-eye"></i>  </a>
-                                    {% else %}
-                                        <button type="submit" class="btn btn-primary"><span class="text">Add to cart</span> <i class="fas fa-shopping-cart"></i></button>
-                                    {% endif %}
+                                                <div class="mt-4 d-flex">
+                                                    <span class="variant-text">{{value.attribute}}</span>
+                                                    <div>
+                                                        <ul class="row d-flex flex-wrap-wrap">
+                                                            {% for product_variant in product_variants %}
+                                                                {% if product_variants_count > 1 %}
+                                                                <li class="col-md-3 col-sm-4 mt-md-0 mt-sm-4 d-flex flex-row mr-3">
+                                                                    <a class="variant-thumbs-link {% if product_variant.sku_id == single_product.sku_id %} border-primary {% endif %}" href="{{ product_variant.get_url }}">
+                                                                        <div class="variant-thumbs">
+                                                                            <img src="{{product_variant.thumbnail_image.url}}" alt="">
+                                                                        </div>
+                                                                    </a>
+                                                                </li>
+                                                                {% endif %} 
+                                                            {% endfor %}
+                                                        </ul>
+                                                    </div>
+                                                </div>
 
-                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                    <hr>
+                                    <div class="col-12 mt-5">
+
+                                        {% if single_product.stock <= 0 %}
+                                        
+                                        <h5 class="text text-danger">Out of stock</h5>
+                                        {% else %}
+                                            {% if in_cart %}
+                                                <a href="#" class="btn btn-success"><span class="text">Added to cart</span> <i class="fas fa-check"></i>  </a>
+                                                <a href="{% url 'cart' %}" class="btn btn-outline-primary"><span class="text">View Cart</span> <i class="fas fa-eye"></i>  </a>
+                                            {% else %}
+                                                <button type="submit" class="btn btn-primary"><span class="text">Add to cart</span> <i class="fas fa-shopping-cart"></i></button>
+                                            {% endif %}
+                                        {% endif %}
+                                    </div>
+                                </div>
                             </article> <!-- product-info-aside .// -->
                         </form>
                     </main> <!-- col.// -->

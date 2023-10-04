@@ -20,10 +20,10 @@
 
                             <div class="col-md-6">
                                 <figure class="itemside  mb-4">
-                                    <div class="aside"><img src="{{cart_item.product.images.url}}" class="border img-sm"></div>
+                                    <div class="aside"><img src="{{cart_item.product.thumbnail_image.url}}" class="border" style="width: 70px"></div>
                                     <figcaption class="info">
-                                        <a href="{{cart_item.product.get_url}}" class="title text-dark">{{cart_item.product.product_name}} {{cart_item.product.brand}}</a>
-                                        <p class="text-muted small">Matrix: 25 Mpx <br> Brand: {{cart_item.product.brand}}</p>
+                                        <a href="{{cart_item.product.get_url}}" class="title text-dark">{{cart_item.product.get_product_name}} {{cart_item.product.product.brand.brand_name}}</a>
+                                        <p class="text-muted small">Matrix: 25 Mpx <br> Brand: {{cart_item.product.product.brand.brand_name}}</p>
                                     </figcaption>
                                 </figure>
                             </div> <!-- col.// -->

@@ -1,10 +1,11 @@
 from django.shortcuts import render,redirect,reverse
 from carts.models import CartItem
 from .models import Order,OrderProduct,PaymentMethod, Payment
-from store.models import Product
+from store.models import Product,ProductVariant
 from wallet_management.models import Wallet, WalletTransaction
 from django.http import JsonResponse
 import json
+import re
 from django.contrib import messages
 from accounts.models import AddressBook
 from coupon_management.models import Coupon
@@ -14,27 +15,32 @@ from datetime import date
 import datetime
 import razorpay
 
+
 # Create your views here.
 @login_required(login_url='signin')
 def order_summary(request):
     current_user = request.user
     
     #if cart count <= 0 
-    cart_items = CartItem.objects.filter(user = current_user)
-    cart_count= cart_items.count()
+    cart_items = CartItem.objects.filter(user = request.user, is_active =True)
+    cart_count = cart_items.count()
     if cart_count <= 0:
         return redirect('product_store')
-    order_total = 0
-    tax = 0
-    grand_total = 0
     
-    for cart_item in cart_items:
+
+    total_with_orginal_price = 0
+    tax = 0
+    order_total = 0
+    
+    for cart_item  in cart_items:
         order_total += cart_item.subtotal()
-    tax = (5 * order_total) / 100
-    grand_total = order_total + tax
+        # quantity += cart_item.qty
+        total_with_orginal_price += cart_item.product.max_price * cart_item.qty
+    tax = (5*order_total)/100
+    discount = total_with_orginal_price - order_total
     
     if request.method == 'POST':
-        selected_address_id = request.POST.get('address01')
+        selected_address_id = request.POST.get('address')
         
         if selected_address_id is None:
             messages.error(request, "Please choose an address")
@@ -50,7 +56,7 @@ def order_summary(request):
 
         data.user = current_user
         data.tax = tax
-        data.order_total = grand_total
+        data.order_total = order_total
         data.shipping_address = shipping_address
         data.order_note = request.POST.get('order_note')
         data.ip = request.META.get('REMOTE_ADDR')
@@ -58,15 +64,7 @@ def order_summary(request):
         data.save()
         
         #generate order number
-        current_datetime = datetime.datetime.now()
-        current_year = current_datetime.strftime("%Y")
-        current_month = current_datetime.strftime("%m")
-        current_day = current_datetime.strftime("%d")
-        current_hour = current_datetime.strftime("%H")
-        current_minute = current_datetime.strftime("%M")
-        concatenated_datetime = current_year + current_month + current_day + current_hour + current_minute
-        
-        order_number = 'HH-ORD'+concatenated_datetime+str(data.id)
+        order_number = 'HH-ORD'+str(round(datetime.datetime.now().timestamp()))+str(data.id)
         data.order_number = order_number
         data.save()
         
@@ -76,11 +74,14 @@ def order_summary(request):
         # window.location.href = `{{success_url}}/?order_id={{order.order_number}}&method=RAZORPAY&payment_id=${response.razorpay_payment_id}&payment_order_id=${response.razorpay_order_id}&payment_sign=${response.razorpay_signature}`
         context = { 
             'order': order,
+            'max_total': total_with_orginal_price,
             'cart_items': cart_items,
             'coupons': coupons,
-            'grand_total': grand_total,
+            'grand_total': order_total,
+            'payable_total': order_total + tax,
             'total': order_total,
             'tax': tax,
+            'discount': discount,
             'shipping_address': shipping_address,
             'payment_methods': payment_methods,
             }
@@ -89,6 +90,8 @@ def order_summary(request):
         # need to check again==========================================================================
         messages.error(request, 'Please choose a payment option ')
         return redirect('checkout')
+    
+    
     
 
 @login_required(login_url='signin')
@@ -112,10 +115,10 @@ def place_order(request):
         
     tax = (5*order_total)/100
     if request.method == 'POST':
-        if request.POST.get('wallet_balance'):
+        try:
             wallet_selected = int(request.POST.get('wallet_balance'))
-        else:
-            wallet_selected = request.POST.get('wallet_balance')
+        except:
+            wallet_selected = 0
             
         order_number = request.POST.get('order_number_order_summary')
         payment_method = request.POST.get('payment_option')
@@ -134,9 +137,9 @@ def place_order(request):
         if wallet_selected == 1:
             wallet = Wallet.objects.get(user=current_user,is_active=True)
             
-            if wallet.balance <= order.order_total  : 
+            if wallet.balance <= order_total + tax  : 
                  
-                order.order_total = order.order_total - wallet.balance
+                order.order_total = (order.order_total + order.tax) - wallet.balance
                 order.wallet_discount = wallet.balance
                 order.save()
                    
@@ -144,6 +147,7 @@ def place_order(request):
                 order.wallet_discount = order.order_total
                 order.order_total = 0
                 order.save()
+       
         try:  
             if order.order_total == 0:
                 raise Exception
@@ -151,7 +155,7 @@ def place_order(request):
                 client = razorpay.Client(auth=(razor_pay_key_id, razor_pay_secret_key))
                 payment = client.order.create({'amount':float(order.order_total) * 100,"currency": "INR"})  
             else:
-                payment = False 
+                payment = False
         except :
             payment = False
         
@@ -230,14 +234,14 @@ def payment_success(request):
                 orderproduct.user_id = request.user.id
                 orderproduct.product_id = item.product.id
                 orderproduct.quantity = item.qty
-                orderproduct.product_price = item.product.price
+                orderproduct.product_price = item.product.product_price()
                 orderproduct.ordered = True
                 orderproduct.save()
                 
                 #reduce the quantity of soled produce
-                product = Product.objects.get(id=item.product_id)
-                product.stock -= item.qty
-                product.save()
+                product_variant = ProductVariant.objects.get(id=item.product_id)
+                product_variant.stock -= item.qty
+                product_variant.save()
             
             #clear the cart
             CartItem.objects.filter(user=request.user).delete()
@@ -294,14 +298,14 @@ def payment_success(request):
                 orderproduct.user = request.user
                 orderproduct.product = item.product
                 orderproduct.quantity = item.qty
-                orderproduct.product_price = item.product.price
+                orderproduct.product_price = item.product.product_price()
                 orderproduct.ordered = True
                 orderproduct.save()
                 
                 #reduce the quantity of sold products
-                product = Product.objects.get(id=item.product.id)
-                product.stock -= item.qty
-                product.save()
+                product_variant = ProductVariant.objects.get(id=item.product.id)
+                product_variant.stock -= item.qty
+                product_variant.save()
             
             #clear the cart
             CartItem.objects.filter(user=request.user).delete()
@@ -354,14 +358,14 @@ def payment_success(request):
             orderproduct.user_id = request.user.id
             orderproduct.product_id = item.product.id
             orderproduct.quantity = item.qty
-            orderproduct.product_price = item.product.price
+            orderproduct.product_price = item.product.product_price()
             orderproduct.ordered = True
             orderproduct.save()
             
             #reduce the quantity of soled produce
-            product = Product.objects.get(id=item.product_id)
-            product.stock -= item.qty
-            product.save()
+            product_variant = ProductVariant.objects.get(id=item.product_id)
+            product_variant.stock -= item.qty
+            product_variant.save()
         
         #clear the cart
         CartItem.objects.filter(user = request.user).delete()
@@ -422,9 +426,11 @@ def order_complete(request):
                 del request.session['payment_id']
                 return render(request, 'orders/order_complete.html',context)
             except Exception as e:
+                print("123456789")
                 print(e)
                 return redirect('user_home')
                 
     except Exception as e:
+        print("qwertyuio")
         print(e)
         return redirect('user_home')

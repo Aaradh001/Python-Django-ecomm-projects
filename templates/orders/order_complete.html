@@ -7,12 +7,12 @@
     <center><i class="fas fa-check-circle" style="font-size: 72px;margin-bottom: 20px;color: #28A745;"></i></center>
     <h2 class="text-center">Payment Successful</h2>
     <br>
-    <div class="text-center">
-        <a href="{% url 'product_store' %}" class="btn btn-success">Shop more</a>
+    <div class="text-center d-flex flex-column align-items-center">
+        <a href="{% url 'product_store' %}" class="btn btn-success mb-3 w-25">Shop more</a>
     </div>
 </div>
 
-<div class="container" style="margin: 0 auto;width: 50%;padding: 50px;background: #f1f1f1;margin-top: 50px;margin-bottom: 50px;">
+<div class="container" style="margin: 0 auto;width: 50%;padding: 50px;background: #f1f1f1;margin-top: 50px;margin-bottom: 25px;">
     <div class="row invoice row-printable">
         <div class="col-md-12">
             <!-- col-lg-12 start here -->
@@ -66,7 +66,7 @@
                                         <tbody>
                                             {% for ordered_product in ordered_products %}
                                             <tr>
-                                                <td>{{ordered_product.product.product_name}} {{ordered_product.product.brand}}</td>
+                                                <td>{{ordered_product.product.get_product_name}}</td>
                                                 <td class="text-center">{{ordered_product.quantity}}</td>
                                                 <td class="text-center">&#8377;{{ordered_product.price_in_order_product}}</td>
                                             </tr>
@@ -78,25 +78,21 @@
                                                 <th class="text-center ">&#8377;{{sub_total}}</th>
                                             </tr>
                                             <tr>
+                                                <th colspan="2" class="text-right">Coupon discount:</th>
+                                                <th class="text-center text-success"><strong>&#8377;{{coupon_discount|intcomma }}</strong></th>
+                                            </tr>
+                                            <tr>
                                                 <th colspan="2" class="text-right">Tax:</th>
                                                 <th class="text-center text-danger">&#8377;{{tax}}</th>
                                             </tr>
                                             
                                             <tr>
-                                                <th colspan="2" class="text-right">Grand Total:</th>
-                                                <th class="text-center text-danger"><strong>&#8377;{{grand_total}}</strong></th>
-                                            </tr>
-                                            <tr>
                                                 <th colspan="2" class="text-right">Wallet debit:</th>
                                                 <th class="text-center text-success"><strong>&#8377;{{wallet_discount|intcomma }}</strong></th>
                                             </tr>
                                             <tr>
-                                                <th colspan="2" class="text-right">Coupon discount:</th>
-                                                <th class="text-center text-success"><strong>&#8377;{{coupon_discount|intcomma }}</strong></th>
-                                            </tr>
-                                            <tr>
                                                 <th colspan="2" class="text-right">Net payable amount:</th>
-                                                <th class="text-center text-success"><strong>&#8377;{{net_payable_amount|intcomma }}</strong></th>
+                                                <th class="text-center"><strong>&#8377;{{net_payable_amount|intcomma }}</strong></th>
                                             </tr>
 
                                         </tfoot>
@@ -104,7 +100,7 @@
                                 </div>
                             </div>
                             <div class="invoice-footer mt25">
-                                <p class="text-center">Thank you for shopping with us!</p>
+                                <p class="text-center"><strong>Thank you for shopping with us!</strong></p>
                             </div>
                         </div>
                         <!-- col-lg-12 end here -->
@@ -116,7 +112,10 @@
         </div>
         <!-- col-lg-12 end here -->
     </div>
-    </div>
+</div>
+<div class="d-flex justify-content-center mb-5">
+    <a href="{% url 'generate_invoice' invoice.invoice_number %}" class="btn btn-secondary ">Download invoice</a>
+</div>
 
 
 

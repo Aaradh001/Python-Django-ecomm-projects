@@ -114,7 +114,8 @@ def cart(request, total=0, cart_items=None, quantity=0):
         'quantity': quantity,
         'cart_items': cart_items,
         'tax': tax,
-        'grand_total': grand_total,
+        'total': total,
+        'payable_amount': grand_total,
     }
         
     return render(request, 'store/cart.html', context)
@@ -124,7 +125,6 @@ def checkout(request, total=0, cart_items=None, quantity=0):
     try:
         total_with_orginal_price = 0
         tax = 0
-        grand_total = 0
         cart_items = CartItem.objects.filter(user = request.user, is_active =True)
         
         for cart_item  in cart_items:
@@ -132,7 +132,6 @@ def checkout(request, total=0, cart_items=None, quantity=0):
             quantity += cart_item.qty
             total_with_orginal_price += cart_item.product.max_price * cart_item.qty
         tax = (5*total)/100
-        grand_total = total + tax
         discount = total_with_orginal_price - total
     except ObjectDoesNotExist:
         pass
@@ -145,7 +144,7 @@ def checkout(request, total=0, cart_items=None, quantity=0):
         'quantity': quantity,
         'cart_items': cart_items,
         'tax': tax,
-        'grand_total': grand_total,
+        'grand_total': total,
         'addresses': addresses,
         'address_form': address_form,
         'discount': discount,

@@ -1,0 +1,18 @@
+{% autoescape off %}
+Hi {{user.full_name}},
+Your order has been confirmed.
+<p style="margin-bottom: 30px;">
+    Payment type: {{order.payment.payment_method}} <br>
+    Grand total: {{order.order_total}} <br>
+    Order status: {{order.order_status}} <br>
+</p>
+
+<h6>Shipping address</h6>
+<p>
+    {{order.shipping_address.get_user_full_address}}
+</p> 
+
+For more detail of your order click <a href="http://{{domain}}{% url 'order-history-detail' order.order_number  %}">here</a>
+
+
+{% endautoescape %}

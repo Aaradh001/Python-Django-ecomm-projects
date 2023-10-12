@@ -11,6 +11,7 @@ urlpatterns = [
     path("payment/failed/", views.payment_failed, name="payment-failed"),
     
     path("order_complete", views.order_complete, name="order_complete"),
+    path("order-success/download-invoice/<str:invoice_number>", views.generate_invoice, name="generate_invoice"),
     
     path("order-summary/coupon/verify/", coupon_verify, name="coupon_verify"),
 ]

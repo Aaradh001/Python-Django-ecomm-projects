@@ -130,29 +130,29 @@
                             <dt>Total price:</dt>
                             <dd class="text-right">&#8377; {{total|intcomma}}</dd>
                         </dl>
-                        <dl class="dlist-align">
-                            <dt>Tax:</dt>
-                            <dd class="text-right"> &#8377; {{tax|intcomma}}</dd>
-                        </dl>
-                        <dl class="dlist-align">
-                            <dt>Grand Total:</dt>
-                            <dd class="text-right text-dark b"><strong>&#8377; {{grand_total|intcomma}}</strong></dd>
-                        </dl>
-
-                        <dl class="dlist-align">
-                            <dt>Wallet Discount:</dt>
-                            <dd class="text-right text-success"><strong>&#8377; {{order.wallet_discount|intcomma }}</strong></dd>
-                        </dl>
+                        
                         <dl class="dlist-align">
                             <dt>Coupon Discount:</dt>
                             <dd class="text-right text-success"><strong>&#8377; {{order.additional_discount|intcomma }}</strong></dd>
                         </dl>
-
+                        <dl class="dlist-align">
+                            <dt>Grand Total:</dt>
+                            <dd class="text-right text-dark b"><strong>&#8377; {{total|intcomma}}</strong></dd>
+                        </dl>
+                        <dl class="dlist-align">
+                            <dt>Tax:</dt>
+                            <dd class="text-right"> &#8377; {{tax|intcomma}}</dd>
+                        </dl>
+                        
+                        <dl class="dlist-align">
+                            <dt>Paid by wallet:</dt>
+                            <dd class="text-right text-success"><strong>&#8377; {{order.wallet_discount|intcomma }}</strong></dd>
+                        </dl>
                         <hr>
 
                         <dl class="dlist-align">
                             <dt>Payable Total:</dt>
-                            <dd class="text-right text-dark b"><strong>&#8377; {{order.order_total|intcomma }}</strong></dd>
+                            <dd class="text-right text-dark b"><strong>&#8377; {{grand_total|intcomma }}</strong></dd>
                         </dl>
                         <hr>
                         <p class="text-center mb-3">

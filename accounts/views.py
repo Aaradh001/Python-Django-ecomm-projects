@@ -16,11 +16,11 @@ from carts.views import _cart_id
 import requests
 # forgot password
 from django.contrib.sites.shortcuts import get_current_site
-from django.template.loader import render_to_string
 from django.utils.http import urlsafe_base64_encode,urlsafe_base64_decode
 from django.utils.encoding import force_bytes
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import EmailMessage
+from django.template.loader import render_to_string
 from carts.models import Cart,CartItem
 from carts.views import _cart_id
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
@@ -277,6 +277,7 @@ def add_address(request, source):
         address_form = AddressBookForm(request.POST)
         if address_form.is_valid():
             address = address_form.save(commit = False)
+            address.is_default = True
             address.user = request.user
             address.save()
             if source == 'checkout':
@@ -328,12 +329,16 @@ def order_history(request):
 
 @login_required(login_url = 'signin')
 def order_history_detail(request, order_id):
+
     print("hiiiiiiiiiiiiiii")
     print(order_id)
     try:
         order = Order.objects.get(user=request.user, order_number=order_id)
+        print(order)
         order_products = OrderProduct.objects.filter(user=request.user, order=order)
+        print(order_products)
         payment = Payment.objects.get(user=request.user, payment_id=order.payment)
+        print(payment)
         sub_total = 0
         tax = 0
         grand_total = 0
@@ -345,7 +350,8 @@ def order_history_detail(request, order_id):
         grand_total  = sub_total + tax
 
     except Order.DoesNotExist:
-        return redirect('store')
+        messages.warning(request, 'This details of this order are not available !')
+        return redirect('order_history')
       
     context = {
         'order': order,
@@ -369,14 +375,24 @@ def order_cancel_user(request,order_id):
         order.order_status='Cancelled by User'
         order.save()
         wallet = Wallet.objects.get(user=request.user,is_active=True)
-        wallet.balance += (order.order_total + order.wallet_discount)
+        if order.payment.payment_method.method_name == 'COD':
+            wallet.balance += order.wallet_discount
+        else:
+            wallet.balance += (order.order_total + order.wallet_discount)
+
         wallet.save()
         
+        if order.payment.payment_method.method_name == 'COD':
+            amount = order.wallet_discount
+        else:
+            amount = (order.order_total + order.wallet_discount)
+
         wallet_transaction = WalletTransaction.objects.create(
             wallet = wallet,
             transaction_type = 'CREDIT',
-            transaction_detail = str(order.order_number) + '  CANCELLED',
-            amount = order.wallet_discount
+            transaction_detail = str(order.order_number) + ' CANCELLED',
+            order = order,
+            amount = amount
             )
         wallet_transaction.save()
         

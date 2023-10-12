@@ -52,6 +52,20 @@ def coupon_verify(request):
                 'payable_total': payable_total,
                 })
             
+
+
+
+
+
+
+
+
+
+
+
+
+
+            
             
             
         

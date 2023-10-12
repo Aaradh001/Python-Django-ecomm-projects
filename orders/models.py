@@ -81,3 +81,18 @@ class OrderProduct(models.Model):
     
     def __str__(self):
         return str(self.order)
+
+
+
+class Invoice(models.Model):
+    invoice_number = models.CharField(max_length=30)
+    order = models.ForeignKey(Order, on_delete=models.DO_NOTHING)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+
+    def __str__(self) -> str:
+        return self.invoice_number
+
+    def save(self, *args, **kwargs):
+            self.invoice_number = 'HHSO-0' + str(Invoice.objects.all().count() + 1)
+            super(Invoice, self).save(*args, **kwargs)

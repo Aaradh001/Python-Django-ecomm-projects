@@ -62,7 +62,7 @@
                                             {{transaction.transaction_type}}
                                         </td>
                                         <td>{{transaction.created_at}}</td>
-                                        <td><a href="{% url 'order-history-detail' 'transaction.order.order_number' %}">{{transaction.order.order_number}}</a></td>
+                                        <td><a href="{% url 'order-history-detail' transaction.order.order_number %}">{{transaction.order.order_number}}</a></td>
                                         <td><a href="#">{{transaction.amount}}</a></td>
                                     </tr>
                                 {% endfor %}

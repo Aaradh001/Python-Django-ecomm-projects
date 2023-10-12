@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'orders',
     'wallet_management',
     'coupon_management',
+    'offer_management',
 ]
 
 MIDDLEWARE = [
@@ -73,6 +74,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'category_management.context_processors.menu_links',
+                'category_management.context_processors.all_attribute',
                 'accounts.context_processors.menu_links',
                 'carts.context_processors.counter',
                 'wallet_management.context_processors.wallet_balance',
@@ -166,9 +168,8 @@ EMAIL_HOST_PASSWORD = 'tzhirmkbfpgramxz'
 
 
 
-
 #For To Enable Popus in Django or else it will block the payment popup
-
+SECURE_CROSS_ORIGIN_OPENER_POLICY = "same-origin-allow-popups"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field

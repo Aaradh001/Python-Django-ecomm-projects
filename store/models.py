@@ -4,6 +4,7 @@ from django.urls import reverse
 from category_management.models import Category
 from django.utils.text import slugify
 from django.db.models import UniqueConstraint, Q
+from datetime import datetime
 # Create your models here.
 
 
@@ -115,19 +116,51 @@ class ProductVariant(models.Model):
     def product_price(self):
         offer_percentage=0
        
-        # #adding catggry offer
-        # if self.product.product_catg.categoryoffer_set.filter(is_active=True, expire_date__gte=datetime.now()).exists():
-        #         offer_percentage = self.product.product_catg.categoryoffer_set.filter(is_active=True, expire_date__gte=datetime.now()).values_list('discount_percentage', flat=True).order_by('-discount_percentage').first()
+        #adding catggry offer
+        if self.product.category.categoryoffer_set.filter(is_active=True, expire_date__gte=datetime.now()).exists():
+                offer_percentage = self.product.category.categoryoffer_set.filter(is_active=True, expire_date__gte=datetime.now()).values_list('discount_percentage', flat=True).order_by('-discount_percentage').first()
+                print()
         
-        # #adding product offer
-        # if self.productoffer_set.filter(is_active=True, expire_date__gte=datetime.now()).exists():
-        #         offer_percentage = offer_percentage+self.productoffer_set.filter(is_active=True, expire_date__gte=datetime.now()).values_list('discount_percentage', flat=True).order_by('-discount_percentage').first()
+        #adding product offer
+        if self.productoffer_set.filter(is_active=True, expire_date__gte=datetime.now()).exists():
+                offer_percentage = offer_percentage+self.productoffer_set.filter(is_active=True, expire_date__gte=datetime.now()).values_list('discount_percentage', flat=True).order_by('-discount_percentage').first()
         
-        # if offer_percentage >=100:
-        #     offer_percentage = 100
+        if offer_percentage >=100:
+            offer_percentage = 100
          
         offer_price =  self.sale_price - self.sale_price * (offer_percentage) / (100)
         return offer_price
+    
+
+
+    def product_offer(self):
+        offer_price = {
+            'offer_percentage': 0,
+            'offer_name': ""
+        }
+        
+        #category offer
+        if self.product.product_catg.categoryoffer_set.filter(is_active=True, expire_date__gte=datetime.now()).exists():
+            category_offer = self.product.product_catg.categoryoffer_set.filter(is_active=True, expire_date__gte=datetime.now()).order_by('-discount_percentage').first()
+            offer_price['offer_percentage'] = category_offer.discount_percentage
+            offer_price['offer_name'] = category_offer.offer_name
+          
+           
+        #product_offer
+        if self.productoffer_set.filter(is_active=True, expire_date__gte=datetime.now()).exists():
+            try:
+                product_offer = self.productoffer_set.filter(is_active=True, expire_date__gte=datetime.now()).order_by('-discount_percentage').first()
+                
+                offer_price['offer_percentage'] += product_offer.discount_percentage
+                offer_price['offer_name'] += ","+product_offer.offer_name
+            except Exception as e:
+                
+                print(e)
+        if offer_price['offer_percentage'] >=100:
+            offer_price['offer_percentage'] = 100
+               
+        return offer_price
+
 
 
 class ProductImage(models.Model):

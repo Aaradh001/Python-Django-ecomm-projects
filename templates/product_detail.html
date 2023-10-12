@@ -113,34 +113,36 @@
                                     <div class="col-12">
                                         <p>{{single_product.product.description}}</p>
                                     </div>
-                                    {% for value in single_product.attributes.all %}
-                                    <div class="col-12 d-block">
-                                        <div class="text-left">
-                                            <div class="col-6">
+                                    {% if product_variants_count > 1 %}
+                                        {% for value in single_product.attributes.all %}
+                                        <div class="col-12 d-block">
+                                            <div class="text-left">
+                                                <div class="col-6">
 
-                                                <div class="mt-4 d-flex">
-                                                    <span class="variant-text">{{value.attribute}}</span>
-                                                    <div>
-                                                        <ul class="row d-flex flex-wrap-wrap">
-                                                            {% for product_variant in product_variants %}
-                                                                {% if product_variants_count > 1 %}
-                                                                <li class="col-md-3 col-sm-4 mt-md-0 mt-sm-4 d-flex flex-row mr-3">
-                                                                    <a class="variant-thumbs-link {% if product_variant.sku_id == single_product.sku_id %} border-primary {% endif %}" href="{{ product_variant.get_url }}">
-                                                                        <div class="variant-thumbs">
-                                                                            <img src="{{product_variant.thumbnail_image.url}}" alt="">
-                                                                        </div>
-                                                                    </a>
-                                                                </li>
-                                                                {% endif %} 
-                                                            {% endfor %}
-                                                        </ul>
+                                                    <div class="mt-4 d-flex">
+                                                        <span class="variant-text">{{value.attribute}}</span>
+                                                        <div>
+                                                            <ul class="row d-flex flex-wrap-wrap">
+                                                                {% for product_variant in product_variants %}
+
+                                                                
+                                                                    <li class="col-md-3 col-sm-4 mt-md-0 mt-sm-4 d-flex flex-row mr-3">
+                                                                        <a class="variant-thumbs-link {% if product_variant.sku_id == single_product.sku_id %} border-primary {% endif %}" href="{{ product_variant.get_url }}">
+                                                                            <div class="variant-thumbs">
+                                                                                <img src="{{product_variant.thumbnail_image.url}}" alt="">
+                                                                            </div>
+                                                                        </a>
+                                                                    </li>
+                                                                    {% endfor %}
+                                                                </ul>
+                                                            </div>
+                                                        </div>
+                                                        
                                                     </div>
                                                 </div>
-
                                             </div>
-                                        </div>
-                                    </div>
-                                    {% endfor %}
+                                            {% endfor %}
+                                        {% endif %} 
                                     <hr>
                                     <div class="col-12 mt-5">
 

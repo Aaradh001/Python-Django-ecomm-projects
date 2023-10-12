@@ -411,8 +411,9 @@ function wallet_balance_add()
 {
   if (document.getElementById('wallet_balance').checked) 
   {
-      document.getElementById('wallet_balance').value = 1
-      get_wallet_grand_total(document.getElementById('order_number_order_summary').value)
+    console.log(document.getElementById('wallet_balance'));
+    document.getElementById('wallet_balance').value = 1
+    get_wallet_grand_total(document.getElementById('order_number_order_summary').value)
 
 
   } else {

@@ -1,19 +1,25 @@
 from django.shortcuts import render,redirect,reverse
 from carts.models import CartItem
-from .models import Order,OrderProduct,PaymentMethod, Payment
+from .models import Order,OrderProduct,PaymentMethod, Payment, Invoice
 from store.models import Product,ProductVariant
 from wallet_management.models import Wallet, WalletTransaction
 from django.http import JsonResponse
 import json
-import re
+from django.contrib.sites.shortcuts import get_current_site
+from django.core.mail import EmailMessage
+from django.template.loader import render_to_string
 from django.contrib import messages
 from accounts.models import AddressBook
 from coupon_management.models import Coupon
 from django.contrib.auth.decorators import login_required
 from accounts.otp_verification.secure import razor_pay_key_id, razor_pay_secret_key
 from datetime import date
+from django.http import HttpResponse
 import datetime
 import razorpay
+# pdf convertion
+from django.template.loader import get_template
+from xhtml2pdf import pisa
 
 
 # Create your views here.
@@ -133,20 +139,22 @@ def place_order(request):
         except Exception as e:
             print(e)
             
-        
+        print("wallet selected", wallet_selected)
         if wallet_selected == 1:
+
             wallet = Wallet.objects.get(user=current_user,is_active=True)
-            
-            if wallet.balance <= order_total + tax  : 
-                 
-                order.order_total = (order.order_total + order.tax) - wallet.balance
-                order.wallet_discount = wallet.balance
-                order.save()
-                   
-            else:
-                order.wallet_discount = order.order_total
-                order.order_total = 0
-                order.save()
+            print(wallet.balance)
+            print(order.order_total, order.tax, order_total, tax, order.wallet_discount)
+            if not order.wallet_discount:
+                if wallet.balance <= order_total + tax  : 
+                    order.order_total = (order.order_total + order.tax) - wallet.balance
+                    order.wallet_discount = wallet.balance
+                    order.save()
+                    
+                else:
+                    order.wallet_discount = order.order_total
+                    order.order_total = 0
+                    order.save()
        
         try:  
             if order.order_total == 0:
@@ -165,7 +173,7 @@ def place_order(request):
         context = {
             'order': order,
             'cart_items': cart_items,
-            'grand_total': order_total + tax,
+            'grand_total': order.order_total,
             'razor_pay_key_id': razor_pay_key_id,
             'razor_pay_secret_key': razor_pay_secret_key,
             'total': order_total,
@@ -191,6 +199,20 @@ def payment_success(request):
         return redirect('user_home')
     
     payment_method_is_active = PaymentMethod.objects.filter(method_name=payment_method,is_active=True).exists()
+    current_site = get_current_site(request)
+    mail_subject = "Thank you for purchasing at us!"
+    message = render_to_string('orders/order_confirmation_mail.html',{
+        'user': request.user,
+        'domain': current_site,
+        'order' : order,
+    })
+    to_email = request.user.email
+    send_email = EmailMessage(mail_subject, message, to=[to_email])
+    send_email.content_subtype = 'html'
+    send_email.send()
+
+
+
 
     if payment_method == 'COD':
         if payment_method_is_active:
@@ -376,6 +398,8 @@ def payment_success(request):
         
     else:
         return redirect('user_account')
+
+
         
 def payment_failed(request):
     context = {
@@ -409,6 +433,10 @@ def order_complete(request):
                 tax = (5*sub_total)/100
                 payment = Payment.objects.get(payment_id=payment_id)
                 
+                invoice = Invoice()
+                invoice.order = order
+                invoice.save()
+
                 context = {
                     'order': order,
                     'order_number': order_number,
@@ -418,12 +446,13 @@ def order_complete(request):
                     'grand_total': sub_total + tax,
                     'wallet_discount': wallet_transaction.amount,
                     'coupon_discount': order.additional_discount,
-                    'net_payable_amount': order.order_total,
-                    'ordered_products': ordered_products
+                    'net_payable_amount': order.order_total+order.tax,
+                    'ordered_products': ordered_products,
+                    'invoice': invoice
                     }
                 
-                del request.session['order_number']
-                del request.session['payment_id']
+                # del request.session['order_number']
+                # del request.session['payment_id']
                 return render(request, 'orders/order_complete.html',context)
             except Exception as e:
                 print("123456789")
@@ -434,3 +463,46 @@ def order_complete(request):
         print("qwertyuio")
         print(e)
         return redirect('user_home')
+
+
+
+
+def generate_invoice(request, invoice_number):
+    try:
+        invoice = Invoice.objects.get(invoice_number = invoice_number)
+    except:
+        messages.warning(request, 'Invoice not generated for this order !')
+    
+    try:
+        order_products = OrderProduct.objects.filter(order = invoice.order)
+
+    except Exception as e:
+        print(e)
+
+    sub_total = 0
+    
+    for i in order_products:
+        sub_total += i.product_price * i.quantity
+
+    template_path = 'orders/invoice_pdf.html'
+    context = {
+        'invoice': invoice,
+        'ordered_products': order_products,
+        'sub_total': sub_total,
+        'payable_amount': invoice.order.order_total + invoice.order.tax,
+        'order': invoice.order,
+        }
+    # Create a Django response object, and specify content_type as pdf
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = f'filename="{invoice.invoice_number}.pdf"'
+    # find the template and render it.
+    template = get_template(template_path)
+    html = template.render(context)
+
+    # create a pdf
+    pisa_status = pisa.CreatePDF(
+       html, dest=response)
+    # if error then show some funny view
+    if pisa_status.err:
+       return HttpResponse('We had some errors <pre>' + html + '</pre>')
+    return response

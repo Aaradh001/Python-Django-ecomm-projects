@@ -7,6 +7,11 @@
  .product-image {
     width: max-content;
  }
+
+ .product_card{
+   background-color: #fdfeff;
+ }
+ 
  
  .cart-empty{
    background-color: rgb(236, 228, 228);

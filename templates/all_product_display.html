@@ -47,49 +47,49 @@
                             
                             <ul class="list-menu">
                                 {% for category in all_categories_list %}
-                                {% if not category.parent %}
-                                <li>
-                                    <a href="{{category.get_url}}" class="">
-                                        <h6 class="d-inline-block">{{category.category_name}}</h6>
-                                    </a>
-                                    <a href="" data-toggle="collapse" data-target="#collapse_sub{{forloop.counter}}" aria-expanded="true">
-                                        <i class="icon-control fa fa-chevron-down float-right"></i>
-                                    </a>
-                                    
-                                    <div class="filter-content collapse" id="collapse_sub{{forloop.counter}}">
-                                        <div class="card-body bg-white">
-                                            <ul class="list-menu">
-                                                {% for subcategory in all_categories_list %}
-                                                {% if subcategory.parent == category %}
-                                                    <li>
-                                                        <a href="{{subcategory.get_url}}">
+                                    {% if not category.parent %}
+                                    <li>
+                                        <a href="{{category.get_url}}" class="">
+                                            <h6 class="d-inline-block">{{category.category_name}}</h6>
+                                        </a>
+                                        <a href="" data-toggle="collapse" data-target="#collapse_sub{{forloop.counter}}" aria-expanded="true">
+                                            <i class="icon-control fa fa-chevron-down float-right"></i>
+                                        </a>
+                                        
+                                        <div class="filter-content collapse" id="collapse_sub{{forloop.counter}}">
+                                            <div class="card-body">
+                                                <ul class="list-menu">
+                                                    {% for subcategory in all_categories_list %}
+                                                    {% if subcategory.parent == category %}
+                                                    <li class="bg-dark p-2 rounded">
+                                                        <a href="{{subcategory.get_url}}" class="text-light">
                                                             {{subcategory.category_name}}
                                                         </a>
                                                     </li>
-                                                {% endif %}
-                                                {% endfor %}
-                                            </ul>
+                                                    {% endif %}
+                                                    {% endfor %}
+                                                </ul>
+                                            </div>
                                         </div>
-                                    </div>
-                                </li>
-                                {% endif %}
-                                {% endfor %}
-                            </ul>
-                            
-                        </div> <!-- card-body.// -->
-                    </div>
-                </article> <!-- filter-group  .// -->
-
-
-                {% for attribute in all_attribute_list %}
-                <article class="filter-group">
-                    <header class="card-header bg-secondary">
-                        <a href="#" data-toggle="collapse" data-target="#collapse_color" aria-expanded="true" class="text-decoration-none text-white">
-                            <i class="icon-control fa fa-chevron-down"></i>
-                            <h6 class="title">{{attribute.attribute_name}} </h6>
-                        </a>
-                    </header>
-                    <div class="filter-content collapse show" id="collapse_{{attribute.attribute_name}}">
+                                    </li>
+                                    {% endif %}
+                                    {% endfor %}
+                                </ul>
+                                
+                            </div> <!-- card-body.// -->
+                        </div>
+                    </article> <!-- filter-group  .// -->
+                    
+                    
+                    {% for attribute in all_attribute_list %}
+                    <article class="filter-group">
+                        <header class="card-header bg-secondary">
+                            <a href="#" data-toggle="collapse" data-target="#collapse_color" aria-expanded="true" class="text-decoration-none text-light">
+                                <i class="icon-control fa fa-chevron-down"></i>
+                                <h6 class="title">{{attribute.attribute_name}} </h6>
+                            </a>
+                        </header>
+                    <div class="filter-content collapse" id="collapse_{{attribute.attribute_name}}">
                         <div class="card-body">
                             <ul class="list-menu">
                                 {% for value in attribute.attributevalue_set.all %}
@@ -112,8 +112,8 @@
                 {% endfor %}
 
                 <article class="filter-group">
-                    <header class="card-header">
-                        <a href="#" data-toggle="collapse" data-target="#collapse_price_range" aria-expanded="true" class="text-decoration-none text-dark">
+                    <header class="card-header bg-secondary">
+                        <a href="#" data-toggle="collapse" data-target="#collapse_price_range" aria-expanded="true" class="text-decoration-none text-light">
                             <i class="icon-control fa fa-chevron-down"></i>
                             <h6 class="title">Price range </h6>
                         </a>
@@ -127,7 +127,7 @@
                               <input class="form-control" placeholder="Rs 0" type="number" id="filter-price-range-min" value="{% if price_min %}{{ price_min }}{% endif %}">
                                 
                             </div>
-                            <div class="form-group text-right col-md-6">
+                            <div class="form-group  col-md-6">
                               <label>Max</label>
                               <input class="form-control" placeholder="Rs 5,000,00" type="number" id="filter-price-range-max" value="{% if price_max %}{{ price_max }}{% endif %}">
                             </div>
@@ -150,14 +150,16 @@
                 
             </div>
     </header><!-- sect-heading -->
-    
+    {% if not product_variants_count %}
+        <img src="{% static 'images/items/noproductfound.jpg' %}" class="mw-100"/>
+    {% endif %}
     <div class="row">
         {% if product_variants %}
         {% for variant in product_variants %}
-        <div class="col-md-4">
+        <div class="col-md-4 px-3 py-2">
             <figure class="card card-product-grid">
                 <!-- offer -->
-                <div class="m-2 position-absolute" style="z-index: 2;">
+                <div class="m-2 position-absolute" style="z-index: 2; top: 0; right: 0;">
                     {% if variant.product_offer.offer_percentage != 0 %}
                         <button type="button" class="btn btn-danger m-0 ">
                             -{{ variant.product_offer.offer_percentage }}%
@@ -168,12 +170,8 @@
                         </button>
                     {% endif %} 
                 </div>
-
-
-
-
                 <a href="{{variant.get_url}}">
-                    <div class="img-wrap"> 
+                    <div class="img-wrap p-4 product_card">
                         <img src="{{variant.thumbnail_image.url}}">
                     </div> <!-- img-wrap.// -->
                 </a>
@@ -201,10 +199,6 @@
             </figure>
         </div> <!-- col.// -->
         {% endfor %}
-        {% else %}
-        <div>
-            <h2>No results found!</h2>
-        </div>
         {% endif %}
     </div> <!-- row end.// -->
     

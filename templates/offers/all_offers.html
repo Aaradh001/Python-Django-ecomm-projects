@@ -20,7 +20,7 @@
                     <b> Applicable Categories</b>
                     <p>
                         {% for category in categoryoffer.category.all %}
-                            {{ category.cat_name }},
+                            <div class="text-success mx-1 my-2 d-inline-block ">{{ category.category_name }},</div>
                         {% endfor %}
                     </p>
                     <a href="{% url 'store-category-offers' categoryoffer.category_offer_slug %}" class="btn btn-dark">View Products</a>
@@ -48,13 +48,13 @@
                 <img class="card-img-top " src="{{productoffer.product_offer_image.url}}" alt="Card image cap">
                     <div class="card-body">
                     <h5 class="card-title">{{productoffer.offer_name}}</h5>
-                    <b> Applicable Products</b>
+                    <b> Applicable Products:</b>
                     <p>
                     {% for product in productoffer.product.all %}
-                        {{ product.get_product_name }},
+                    <div class="text-success mx-1 my-2 d-inline-block ">{{ product.get_product_name }},</div>
                     {% endfor %}
                     </p>
-                    <a href="{% url 'store-product-offers' productoffer.product_offer_slug %}" class="btn btn-dark">View Products</a>
+                    <a href="" class="btn btn-dark">View Products</a>
                     
                     </div>
                 </div>

@@ -89,7 +89,7 @@ def user_signin(request):
             except:
                 pass
             login(request, user)
-            messages.success(request, "You are successfully signed in")
+            messages.success(request, "You are successfully signed in !")
             url = request.META.get('HTTP_REFERER')
             try:
                 query = requests.utils.urlparse(url).query

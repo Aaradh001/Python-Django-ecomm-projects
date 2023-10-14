@@ -23,16 +23,16 @@ class CartItem(models.Model):
     def subtotal(self):
         
         offer_percentage=0
-        #adding catggry offer
-        # if self.product.product.category.categoryoffer_set.filter(is_active=True, expire_date__gte=datetime.now()).exists():
-        #         offer_percentage = self.product.product.category.categoryoffer_set.filter(is_active=True, expire_date__gte=datetime.now()).values_list('discount_percentage', flat=True).order_by('-discount_percentage').first()
+        # adding catggry offer
+        if self.product.product.category.categoryoffer_set.filter(is_active=True, expire_date__gte=datetime.now()).exists():
+                offer_percentage = self.product.product.category.categoryoffer_set.filter(is_active=True, expire_date__gte=datetime.now()).values_list('discount_percentage', flat=True).order_by('-discount_percentage').first()
         
-        # #adding product offer
-        # if self.product.productoffer_set.filter(is_active=True, expire_date__gte=datetime.now()).exists():
-        #         offer_percentage = offer_percentage+self.product.productoffer_set.filter(is_active=True, expire_date__gte=datetime.now()).values_list('discount_percentage', flat=True).order_by('-discount_percentage').first()
+        #adding product offer
+        if self.product.productoffer_set.filter(is_active=True, expire_date__gte=datetime.now()).exists():
+                offer_percentage = offer_percentage+self.product.productoffer_set.filter(is_active=True, expire_date__gte=datetime.now()).values_list('discount_percentage', flat=True).order_by('-discount_percentage').first()
 
-        # if offer_percentage >=100:
-        #     offer_percentage = 100
+        if offer_percentage >=100:
+            offer_percentage = 100
             
         offer_price =  self.product.sale_price - self.product.sale_price * (offer_percentage) / (100)
         

@@ -468,3 +468,40 @@ function get_wallet_grand_total(order_number,check=true)
 
 }
 
+
+
+
+
+// ==================Price filter===================
+
+
+function filterWithPriceRange(min,max) {
+  const urlParams = new URLSearchParams(window.location.search);
+
+  try{
+      var price_min = document.getElementById(min).value
+
+    }
+  catch
+    {
+      var price_min = 0
+    }
+    
+    try{
+        var price_max = document.getElementById(max).value
+
+      }
+    catch
+      {
+        var price_max = ''
+      }
+
+  urlParams.set('price-min',  price_min.toString());
+  console.log("============", urlParams);
+  urlParams.set('price-max', price_max.toString());
+  console.log("[[[[[[]]]]]]", urlParams);
+  console.log("---------------- :",urlParams.toString());
+  const newUrl = `${window.location.pathname}?${urlParams.toString()}`;
+  console.log("((((((())))))) ", newUrl);
+  window.location.href = newUrl;
+  }

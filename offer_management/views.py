@@ -17,6 +17,8 @@ class all_offers_store(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        offer = CategoryOffer.objects.filter(is_active=True, expire_date__gte=datetime.now())
+        
         context['category_offers'] = CategoryOffer.objects.filter(is_active=True, expire_date__gte=datetime.now()) 
         context['product_offers'] = ProductOffer.objects.filter(is_active=True, expire_date__gte=datetime.now()) 
        
@@ -26,8 +28,8 @@ class all_offers_store(ListView):
 class category_offer_product(View):
     def get(self, request, offer_slug, category_slug=None):
 
-        # price_min = request.GET.get('price-min')
-        # price_max = request.GET.get('price-max')
+        price_min = request.GET.get('price-min')
+        price_max = request.GET.get('price-max')
         
         # #wishlist
         # if request.user.is_authenticated:  
@@ -44,7 +46,7 @@ class category_offer_product(View):
         categories = category_offer.category.filter(is_valid=True)
         
         if category_slug:
-            category = category_offer.category.filter(is_active=True,cat_slug=category_slug)
+            category = category_offer.category.filter(is_valid=True, cat_slug=category_slug)
             product_variants = ProductVariant.objects.select_related('product').prefetch_related('attributes').filter(product__category__in=category,is_active=True)
             product_variants_count = product_variants.count()
         else:
@@ -52,10 +54,10 @@ class category_offer_product(View):
             product_variants_count = product_variants.count()
         
         #price filter 
-        # if price_min:
-        #     product_variants = product_variants.filter(sale_price__gte=price_min)
-        # if price_max:
-        #     product_variants = product_variants.filter(sale_price__lte=price_max)
+        if price_min:
+            product_variants = product_variants.filter(sale_price__gte=price_min)
+        if price_max:
+            product_variants = product_variants.filter(sale_price__lte=price_max)
             
             
         # Get all attribute names from the request avoid certain parameters
@@ -81,12 +83,11 @@ class category_offer_product(View):
             'product_variants': paged_products,
             'product_variants_count': product_variants_count,
             'all_category_list': categories,
-            # 'price_min': price_min,
-            # 'price_max': price_max,
+            'price_min': price_min,
+            'price_max': price_max,
             # 'wishlist_items': wishlist_items
             }
-        return render(request, 'store/offer_items.html', context)
-
+        return render(request, 'offers/category_offer_items.html.html', context)
 
 
 
@@ -96,12 +97,12 @@ class product_offer_product(View):
         price_min = request.GET.get('price-min')
         price_max = request.GET.get('price-max')
         
-        #wishlist
-        if request.user.is_authenticated:  
-            wishlist,created= Wishlist.objects.get_or_create(user=request.user)
-            wishlist_items = WishlistItem.objects.filter(wishlist=wishlist, is_active=True).values_list('product_id', flat=True)
-        else:
-            wishlist_items =[]
+        # #wishlist
+        # if request.user.is_authenticated:  
+        #     wishlist,created= Wishlist.objects.get_or_create(user=request.user)
+        #     wishlist_items = WishlistItem.objects.filter(wishlist=wishlist, is_active=True).values_list('product_id', flat=True)
+        # else:
+        #     wishlist_items =[]
             
     
         try:
@@ -112,7 +113,7 @@ class product_offer_product(View):
         products = product_offer.product.filter(is_active=True).values_list('sku_id')
        
        
-        product_variants = Product_Variant.objects.select_related('product').prefetch_related('atributes').filter(sku_id__in=products,is_active=True)
+        product_variants = ProductVariant.objects.select_related('product').prefetch_related('atributes').filter(sku_id__in=products,is_active=True)
         product_variants_count = product_variants.count()
         
         #price filter 
@@ -141,13 +142,12 @@ class product_offer_product(View):
         
             
         context = {
-            'product_offer':product_offer,
-                'product_variants':paged_products,
-                'product_variants_count':product_variants_count,
-                # 'all_category_list':categories,
-                'price_min':price_min,
-               'price_max':price_max,
-               'wishlist_items':wishlist_items
+            'product_offer': product_offer,
+            'product_variants': paged_products,
+            'product_variants_count': product_variants_count,
+            'price_min': price_min,
+            'price_max': price_max,
+            # 'wishlist_items':wishlist_items
                 
             }
         return render(request,'store/offer_items_product.html',context)

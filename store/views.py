@@ -29,7 +29,10 @@ def home(request):
 
 
 
-def product_store(request, cat_slug = None):
+def product_store(request, cat_slug=None, offer_slug=None):
+
+    price_min = request.GET.get('price-min')
+    price_max = request.GET.get('price-max')
     if cat_slug:
         try:
             category = get_object_or_404(Category, cat_slug = cat_slug)
@@ -46,32 +49,49 @@ def product_store(request, cat_slug = None):
             combined_q = q1 & q2
             
             product_variants = ProductVariant.objects.select_related('product').prefetch_related('attributes').filter(combined_q).order_by('stock')
-            product_variants_count = product_variants.count()
-            paginator = Paginator(product_variants, 3)
-            page = request.GET.get('page')
-            paged_products = paginator.get_page(page)
+            # product_variants_count = product_variants.count()
 
         else:
             q1 = Q(product__category = category)
             q2 = Q(is_active = True)
             combined_q = q1 & q2
-            product_variants = ProductVariant.objects.filter(combined_q).order_by('stock')
-            product_variants_count = product_variants.count()
-            
-            paginator = Paginator(product_variants, 3)
-            page = request.GET.get('page')
-            paged_products = paginator.get_page(page)
-    
+            product_variants = ProductVariant.objects.select_related('product').prefetch_related('attributes').filter(combined_q).order_by('stock')
+            # product_variants_count = product_variants.count()
     else:
         product_variants = ProductVariant.objects.select_related('product').prefetch_related('attributes').filter(is_active=True).order_by('stock')
-        product_variants_count = product_variants.count()
-        paginator = Paginator(product_variants, 3)
-        page = request.GET.get('page')
-        paged_products = paginator.get_page(page)
+
     
+
+    
+    #price filter
+    if price_min:
+        product_variants = product_variants.filter(sale_price__gte=price_min)
+    if price_max:
+        product_variants = product_variants.filter(sale_price__lte=price_max)
+
+    # Get all attribute names from the request and avoid certain parameters
+    attribute_names = [key for key in request.GET.keys() if key not in ['keyword','page','price-min','price-max','RATING']]
+    print(request.GET.keys())
+    #other filter
+    for attribute_name in attribute_names:
+        attribute_values = request.GET.getlist(attribute_name)
+        if attribute_values:
+            product_variants=product_variants.filter(atributes__atribute_value__in=attribute_values)
+
+
+
+    
+
+    paginator = Paginator(product_variants, 6)
+    page = request.GET.get('page')
+    paged_products = paginator.get_page(page)
+
+
+
+
     context = {
         'product_variants'       : paged_products,
-        'product_variants_count' : product_variants_count,
+        'product_variants_count' : len(product_variants),
         }
     
     return render(request, 'all_product_display.html', context)
@@ -107,12 +127,16 @@ def product_variant_detail(request, cat_slug, variant_slug):
 
 
 def search(request):
+    print("hi im aaradh ")
+    other_keys = set(request.GET.keys())-{'keyword'}
+    if other_keys:
+        return redirect('product_store')
+
     if 'keyword' in  request.GET:
         keyword = request.GET['keyword']
-        print(keyword)
+        
         if keyword:
             keywords = keyword.split(" ")
-            print(keywords)
             products=[]
             all_products=ProductVariant.objects.all()
             searchresult=[]
@@ -125,7 +149,6 @@ def search(request):
                 else:
                     searchresult.append(keyword)
                     all_products=products
-            print(searchresult)        
             products = set(all_products)
             context = {
                 'product_variants'      : products,

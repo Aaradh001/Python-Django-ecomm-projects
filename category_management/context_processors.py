@@ -8,4 +8,4 @@ def menu_links(request):
 
 def all_attribute(request):
      all_attribute_list = Attribute.objects.filter(is_active=True)
-     return dict(all_attribute_list=all_attribute_list) 
+     return dict(all_attribute_list=all_attribute_list)

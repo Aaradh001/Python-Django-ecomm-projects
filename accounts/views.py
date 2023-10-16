@@ -373,6 +373,10 @@ def order_cancel_user(request,order_id):
     order = Order.objects.get(user=request.user, order_number=order_id)
     if not order.order_status == 'Cancelled by User':
         order.order_status='Cancelled by User'
+        order_products = OrderProduct.objects.filter(order = order)
+        for order_product in order_products:
+            order_product.product.stock += order_product.quantity
+            order_product.product.save()
         order.save()
         wallet = Wallet.objects.get(user=request.user,is_active=True)
         if order.payment.payment_method.method_name == 'COD':
@@ -407,6 +411,10 @@ def order_return_user(request, order_id):
     order = Order.objects.get(user=request.user, order_number=order_id)
     if not order.order_status == 'Returned':
         order.order_status = 'Returned'
+        order_products = OrderProduct.objects.filter(order = order)
+        for order_product in order_products:
+            order_product.product.stock += order_product.quantity
+            order_product.product.save()
         order.save()
         wallet = Wallet.objects.get(user=request.user,is_active=True)
         wallet.balance += (order.order_total + order.wallet_discount)

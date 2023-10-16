@@ -50,6 +50,29 @@ def check_isadmin(view_func, redirect_url="admin_signin"):
 @login_required(login_url='admin_signin')
 @check_isadmin
 def admin_home(request):
+
+    print('=====================')
+    epoch_date = datetime.date(2023, 8, 1)
+    print(epoch_date.year)
+    print(epoch_date.strftime("%B"))
+    print(epoch_date.day)
+    current_date = datetime.date(2024, 8, 1)
+
+    months_list = [date.strftime("%b") for date in [epoch_date.replace(month=(epoch_date.month + i) % 12 + 1, year=epoch_date.year + (epoch_date.month + i - 1) // 12) for i in range((current_date.year - epoch_date.year) * 12 + current_date.month - epoch_date.month )]]
+
+    print(months_list)
+    
+    print('=====================')
+
+
+    orders = Order.objects.all()
+    cancelled_orders = orders.filter(order_status = 'Cancelled by User')
+    successfull_orders = orders.filter(order_status = 'Delivered')
+
+
+
+
+
     
     categories = Category.objects.all()
     print("ADMIN-HOME")
@@ -686,6 +709,7 @@ def change_order_status_admin(request):
         try:
             order = Order.objects.get(order_number=order_number)
             order.order_status = selected_option
+            # if selected_option == 
             order.save()
             return JsonResponse({"status": "success", "selected_option": selected_option})
         except Order.DoesNotExist:
@@ -845,6 +869,9 @@ def attribute_value_control(request):
             print(e)
             return JsonResponse({"status": "error", "message": e })
         
+
+
+
 
 
         

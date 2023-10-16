@@ -127,10 +127,6 @@ def product_variant_detail(request, cat_slug, variant_slug):
 
 
 def search(request):
-    print("hi im aaradh ")
-    other_keys = set(request.GET.keys())-{'keyword'}
-    if other_keys:
-        return redirect('product_store')
 
     if 'keyword' in  request.GET:
         keyword = request.GET['keyword']

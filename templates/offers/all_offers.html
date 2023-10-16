@@ -54,7 +54,7 @@
                     <div class="text-success mx-1 my-2 d-inline-block ">{{ product.get_product_name }},</div>
                     {% endfor %}
                     </p>
-                    <a href="" class="btn btn-dark">View Products</a>
+                    <a href="{% url 'store-product-offers' productoffer.product_offer_slug %}" class="btn btn-dark">View Products</a>
                     
                     </div>
                 </div>

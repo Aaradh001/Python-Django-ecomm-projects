@@ -61,7 +61,7 @@ class category_offer_product(View):
             
             
         # Get all attribute names from the request avoid certain parameters
-        attribute_names = [key for key in request.GET.keys() if key not in ['query','page','price-min','price-max']]
+        attribute_names = [key for key in request.GET.keys() if key not in ['keyword','page','price-min','price-max']]
         
             #other filter
         for attribute_name in attribute_names:
@@ -87,7 +87,7 @@ class category_offer_product(View):
             'price_max': price_max,
             # 'wishlist_items': wishlist_items
             }
-        return render(request, 'offers/category_offer_items.html.html', context)
+        return render(request, 'offers/category_offer_items.html', context)
 
 
 
@@ -113,7 +113,7 @@ class product_offer_product(View):
         products = product_offer.product.filter(is_active=True).values_list('sku_id')
        
        
-        product_variants = ProductVariant.objects.select_related('product').prefetch_related('atributes').filter(sku_id__in=products,is_active=True)
+        product_variants = ProductVariant.objects.select_related('product').prefetch_related('attributes').filter(sku_id__in=products,is_active=True)
         product_variants_count = product_variants.count()
         
         #price filter 
@@ -124,13 +124,13 @@ class product_offer_product(View):
             
             
         # Get all attribute names from the request avoid certain parameters
-        attribute_names = [key for key in request.GET.keys() if key not in ['query','page','price-min','price-max']]
+        attribute_names = [key for key in request.GET.keys() if key not in ['keyword','page','price-min','price-max']]
         
-            #other filter
+        #other filter
         for attribute_name in attribute_names:
             attribute_values = request.GET.getlist(attribute_name)
             if attribute_values:
-                product_variants=product_variants.filter(atributes__atribute_value__in=attribute_values)
+                product_variants=product_variants.filter(attributes__attribute_value__in=attribute_values)
         
         product_variants_count = product_variants.count()
         
@@ -150,5 +150,5 @@ class product_offer_product(View):
             # 'wishlist_items':wishlist_items
                 
             }
-        return render(request,'store/offer_items_product.html',context)
+        return render(request,'offers/product_offer_items.html',context)
     

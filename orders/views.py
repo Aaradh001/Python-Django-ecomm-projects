@@ -12,7 +12,7 @@ from django.contrib import messages
 from accounts.models import AddressBook
 from coupon_management.models import Coupon
 from django.contrib.auth.decorators import login_required
-from accounts.otp_verification.secure import razor_pay_key_id, razor_pay_secret_key
+from django.conf import settings
 from datetime import date
 from django.http import HttpResponse
 import datetime
@@ -160,7 +160,7 @@ def place_order(request):
             if order.order_total == 0:
                 raise Exception
             if payment_method == 'RAZORPAY':
-                client = razorpay.Client(auth=(razor_pay_key_id, razor_pay_secret_key))
+                client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_SECRET_KEY))
                 payment = client.order.create({'amount':float(order.order_total) * 100,"currency": "INR"})  
             else:
                 payment = False
@@ -174,8 +174,8 @@ def place_order(request):
             'order': order,
             'cart_items': cart_items,
             'grand_total': order.order_total,
-            'razor_pay_key_id': razor_pay_key_id,
-            'razor_pay_secret_key': razor_pay_secret_key,
+            'razor_pay_key_id': settings.RAZORPAY_KEY_ID,
+            'razor_pay_secret_key': settings.RAZORPAY_SECRET_KEY,
             'total': order_total,
             'payment': payment,
             'tax': order.tax,

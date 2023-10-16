@@ -11,6 +11,7 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.cache import cache_control
 import random
 from accounts.models import UserProfile
+from wallet_management.models import Wallet
 from store.models import Product, ProductVariant, ProductImage, Attribute, AttributeValue, Brand
 from accounts.otp_verification.helper import MessageHandler
 from coupon_management.models import Coupon
@@ -709,7 +710,20 @@ def change_order_status_admin(request):
         try:
             order = Order.objects.get(order_number=order_number)
             order.order_status = selected_option
-            # if selected_option == 
+            if (selected_option == 'Cancelled by Admin') or (selected_option == 'Cancelled by User'):
+                try:
+                    wallet = Wallet.objects.get(user = request.user,is_active=True)
+                except Exception as e:
+                    print(e)
+                    
+                if order.payment.payment_method.method_name == 'COD':
+                    wallet.balance += order.wallet_discount
+                else:
+                    wallet.balance += (order.order_total + order.wallet_discount)
+
+                wallet.save()
+
+
             order.save()
             return JsonResponse({"status": "success", "selected_option": selected_option})
         except Order.DoesNotExist:

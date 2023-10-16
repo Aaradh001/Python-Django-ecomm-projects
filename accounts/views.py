@@ -202,8 +202,14 @@ def otp_generation(request):
     
     if request.method == 'POST':
         phone_number = request.POST.get('phone_number')
+        print("qwertyuiop")
+        print(phone_number)
+        print("qwertyuiop")
         phone_number = '+91'+phone_number
-        user = User.objects.get(phone_number = phone_number)
+        try:
+            user = User.objects.get(phone_number = phone_number)
+        except Exception as e:
+            print(e)
         if not user:
             messages.error(request, "Invalid phone number")
             return redirect('signin')

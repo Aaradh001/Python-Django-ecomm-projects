@@ -52,32 +52,40 @@ def check_isadmin(view_func, redirect_url="admin_signin"):
 @check_isadmin
 def admin_home(request):
 
-    print('=====================')
-    epoch_date = datetime.date(2023, 8, 1)
-    print(epoch_date.year)
-    print(epoch_date.strftime("%B"))
-    print(epoch_date.day)
-    current_date = datetime.date(2024, 8, 1)
+    # print('=====================')
+    # epoch_date = datetime.date(2023, 8, 1)
+    # print(epoch_date.year)
+    # print(epoch_date.strftime("%B"))
+    # print(epoch_date.day)
+    # current_date = datetime.date(2024, 8, 1)
 
-    months_list = [date.strftime("%b") for date in [epoch_date.replace(month=(epoch_date.month + i) % 12 + 1, year=epoch_date.year + (epoch_date.month + i - 1) // 12) for i in range((current_date.year - epoch_date.year) * 12 + current_date.month - epoch_date.month )]]
+    # months_list = [date.strftime("%b") for date in [epoch_date.replace(month=(epoch_date.month + i) % 12 + 1, year=epoch_date.year + (epoch_date.month + i - 1) // 12) for i in range((current_date.year - epoch_date.year) * 12 + current_date.month - epoch_date.month )]]
 
-    print(months_list)
+    # print(months_list)
     
-    print('=====================')
+    # print('=====================')
 
 
     orders = Order.objects.all()
-    cancelled_orders = orders.filter(order_status = 'Cancelled by User')
-    successfull_orders = orders.filter(order_status = 'Delivered')
-
-
-
-
-
-    
+    # cancelled_orders = orders.filter(order_status = 'Cancelled by User')
+    # successfull_orders = orders.filter(order_status = 'Delivered')
+    recent_orders = orders.filter()
+    today = datetime.date.today()
+    start_date = today - datetime.timedelta(days=15)
+    start_date = timezone.make_aware(
+        datetime.datetime.combine(start_date, datetime.time.min),
+        timezone.get_current_timezone()
+        )
+    recent_orders = orders.filter(created_at__range=(start_date, today))
     categories = Category.objects.all()
+
+    context = {
+        'recent_orders': recent_orders,
+        'categories': categories,
+    }
+
     print("ADMIN-HOME")
-    return render(request, 'admin_templates/admin_home.html', {'categories': categories})
+    return render(request, 'admin_templates/admin_home.html', context)
 
 
 
@@ -491,7 +499,6 @@ def product_variant_update(request, product_variant_slug):
         
     
     if request.method == 'POST':
-        print("----------------------")
         product_variant_form = ProductVariantForm(request.POST,instance=product_variant)
         if product_variant_form.is_valid():
             variant = product_variant_form.save()
@@ -710,12 +717,12 @@ def change_order_status_admin(request):
         try:
             order = Order.objects.get(order_number=order_number)
             order.order_status = selected_option
-            if (selected_option == 'Cancelled by Admin') or (selected_option == 'Cancelled by User'):
+            if selected_option == 'Cancelled by Admin':
                 try:
                     wallet = Wallet.objects.get(user = request.user,is_active=True)
                 except Exception as e:
                     print(e)
-                    
+
                 if order.payment.payment_method.method_name == 'COD':
                     wallet.balance += order.wallet_discount
                 else:

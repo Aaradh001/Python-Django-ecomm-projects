@@ -32,7 +32,7 @@ def add_cart(request, product_id):
             cart_item = CartItem.objects.create(product=product_variant, qty=1, user=current_user)
             # cart_item.save()
         
-        return redirect('cart')
+        return redirect(request.META.get('HTTP_REFERER', '/'))
     else:
         try:
             cart = Cart.objects.get(cart_id = _cart_id(request))   #getting the cart using the cart id present in the session
@@ -48,7 +48,7 @@ def add_cart(request, product_id):
         except CartItem.DoesNotExist:
             cart_item = CartItem.objects.create(product=product_variant, qty=1, cart=cart)
         
-        return redirect('cart')
+        return redirect(request.META.get('HTTP_REFERER', '/'))
 
 
 def remove_cart(request, product_id):

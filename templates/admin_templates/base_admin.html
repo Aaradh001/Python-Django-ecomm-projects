@@ -127,7 +127,7 @@
                 <i class="ti ti-file-description"></i>
                 <span class="hide-menu dropdown-toggle" data-bs-auto-close="outside" data-bs-toggle="dropdown" aria-expanded="false" >All category </span>
                   <ul class="dropdown-menu">
-                    {% for category in all_categories_list %}
+                    {% for category in categories %}
                     {% if not category.parent %}
                    
 
@@ -146,7 +146,7 @@
                       
                       <ul class="dropdown-menu category-dropdown">
                         
-                        {% for subcategory in all_categories_list %}
+                        {% for subcategory in categories %}
                         {% if subcategory.parent == category %}
                         <li class="d-flex justify-between align-items-center">
                           

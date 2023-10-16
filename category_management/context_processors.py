@@ -2,7 +2,7 @@ from category_management.models import Category
 from store.models import Attribute
 
 def menu_links(request):
-    all_categories_list = Category.objects.filter(is_valid =True)
+    all_categories_list = Category.objects.filter(is_valid = True)
     return dict(all_categories_list = all_categories_list)
 
 

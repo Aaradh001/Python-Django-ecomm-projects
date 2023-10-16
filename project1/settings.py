@@ -78,6 +78,7 @@ TEMPLATES = [
                 'category_management.context_processors.all_attribute',
                 'accounts.context_processors.menu_links',
                 'carts.context_processors.counter',
+                'admin_control.context_processors.admin_categories',
                 'wallet_management.context_processors.wallet_balance',
             ],
         },

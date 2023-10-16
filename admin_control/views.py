@@ -718,8 +718,10 @@ def change_order_status_admin(request):
             order = Order.objects.get(order_number=order_number)
             order.order_status = selected_option
             if selected_option == 'Cancelled by Admin':
+                print("yuedrtfiyugfduiwgeui")
                 try:
-                    wallet = Wallet.objects.get(user = request.user,is_active=True)
+                    wallet = Wallet.objects.get(user = order.user,is_active=True)
+                    print(order.user)
                 except Exception as e:
                     print(e)
 
@@ -727,6 +729,7 @@ def change_order_status_admin(request):
                     wallet.balance += order.wallet_discount
                 else:
                     wallet.balance += (order.order_total + order.wallet_discount)
+                    print(wallet.balance)
 
                 wallet.save()
 

@@ -18,6 +18,7 @@
 
 <section class="section-pagetop bg">
     <div class="container">
+        {% include 'includes/alerts.html' %}
         {% if 'search' in request.path %}
         <h2 class="title-page">Search Result</h2>
         {% else %}

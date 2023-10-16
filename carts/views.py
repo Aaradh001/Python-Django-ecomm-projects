@@ -5,6 +5,7 @@ from django.contrib.auth.decorators import login_required
 from carts.models import Cart, CartItem
 from accounts.forms import AddressBookForm
 from accounts.models import AddressBook
+from django.contrib import messages
 # Create your views here.
 
 def _cart_id(request):
@@ -31,7 +32,7 @@ def add_cart(request, product_id):
         except CartItem.DoesNotExist:
             cart_item = CartItem.objects.create(product=product_variant, qty=1, user=current_user)
             # cart_item.save()
-        
+        messages.success(request, "Product added to cart successfully !")
         return redirect(request.META.get('HTTP_REFERER', '/'))
     else:
         try:
@@ -48,6 +49,7 @@ def add_cart(request, product_id):
         except CartItem.DoesNotExist:
             cart_item = CartItem.objects.create(product=product_variant, qty=1, cart=cart)
         
+        messages.success(request, "Product added to cart successfully !")
         return redirect(request.META.get('HTTP_REFERER', '/'))
 
 

@@ -82,7 +82,7 @@
                                 
                             <!-- Secondary carousel image thumbnail gallery -->
                             <div class="small-img">
-                                <img src="{% static './images/test1/next-icon.png' %}" class="icon-left" alt="" id="prev-img">
+                                <img src="{% static 'accounts/images/test1/next-icon.png' %}" class="icon-left" alt="" id="prev-img">
                                     <div class="small-container">
                                         <div id="small-img-roll">
                                             <img src="{{single_product.thumbnail_image.url}}" class="slideshow-thumbnails show-small-img" alt="">
@@ -91,7 +91,7 @@
                                             {% endfor %}
                                         </div>
                                     </div>
-                                <img src="{% static './images/test1/next-icon.png' %}" class="icon-right" alt="" id="next-img">
+                                <img src="{% static 'accounts/images/test1/next-icon.png' %}" class="icon-right" alt="" id="next-img">
                             </div>
 
                             <!-- img-big-wrap.// -->  
@@ -176,7 +176,7 @@
                 
                     <article class="box mb-3">
                         <div class="icontext w-100">
-                            <img src="{% static './images/avatars/avatar1.jpg' %}" class="img-xs icon rounded-circle">
+                            <img src="{% static 'accounts/images/avatars/avatar.png' %}" class="img-xs icon rounded-circle">
                             <div class="text">
                                 <span class="date text-muted float-md-right">24.04.2020 </span>  
                                 <h6 class="mb-1">Mike John </h6>
@@ -196,7 +196,7 @@
         </div> <!-- container .//  -->
     </section>
 
-    <script src="{% static './js/test1/zoom-image.js' %}"></script>
-    <script src="{% static './js/test1/main.js' %}"></script>
+    <script src="{% static 'accounts/js/test1/zoom-image.js' %}"></script>
+    <script src="{% static 'accounts/js/test1/main.js' %}"></script>
     
 {% endblock %}

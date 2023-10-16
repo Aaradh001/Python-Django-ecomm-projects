@@ -143,9 +143,10 @@ STATIC_URL = '/static/'
 
 STATIC_ROOT = BASE_DIR /'static'
 
-STATICFILES_DIRS = [
-    "accounts/static",
-]
+# STATICFILES_DIRS = [
+#     "accounts/",
+#     "admin_control/",
+# ]
 
 # Media files configuration
 MEDIA_URL = '/media/'

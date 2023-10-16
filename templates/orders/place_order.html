@@ -92,7 +92,7 @@
                                 <table border="0"  cellspacing="0" align="center">
                                     <tr>
                                         <td align="center">
-                                            <img style="width: 200px;" src="{% static './images/icons/cash-on-delivery-icon-14.jpg' %}" alt="CASH ON DELIVERY" />
+                                            <img style="width: 200px;" src="{% static 'accounts/images/icons/cash-on-delivery-icon-14.jpg' %}" alt="CASH ON DELIVERY" />
                                         </td>
                                     </tr>
                                 </table>
@@ -104,7 +104,7 @@
                                     <tr>
                                         <td align="center">
                                             <!-- <img src="https://www.paypalobjects.com/digitalassets/c/website/marketing/apac/C2/logos-buttons/optimize/44_Blue_PayPal_Pill_Button.png" alt="PAYPAL" /> -->
-                                            <img style="width: 145px; height: 44px;" src="{% static './images/icons/razorpay.png' %}" alt="RAZORPAY"/>
+                                            <img style="width: 145px; height: 44px;" src="{% static 'accounts/images/icons/razorpay.png' %}" alt="RAZORPAY"/>
                                         </td>
                                     </tr>
                                 </table>
@@ -114,7 +114,7 @@
                                 <table border="0"  cellspacing="0" align="center">
                                     <tr>
                                         <td align="center">
-                                            <img style="width: 80px; height: 60px;" src="{% static './images/icons/wallet.png' %}" alt="RAZORPAY"/>
+                                            <img style="width: 80px; height: 60px;" src="{% static 'accounts/images/icons/wallet.png' %}" alt="RAZORPAY"/>
                                         </td>
                                     </tr>
                                 </table>
@@ -156,7 +156,7 @@
                         </dl>
                         <hr>
                         <p class="text-center mb-3">
-                            <img src="{% static './images/misc/payments.png' %}" height="26">
+                            <img src="{% static 'accounts/images/misc/payments.png' %}" height="26">
                         </p>
                             {% if payment_method == 'COD' %}
                             <button id="cod-btn-1" class="btn btn-primary btn-block"> Confirm COD & Place Order </button>
@@ -210,7 +210,7 @@
         "currency": "INR",
         "name": "HarmonicHut",
         "description": "Payment for order {{order.order_number}}",
-        "image": "{% static 'store/images/logo.png' %}",
+        "image": "{% static 'accounts/images/logo.png' %}",
         "order_id": "{{payment.id}}", //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
        // "callback_url": "https://eneqd3r9zrjok.x.pipedream.net/",
         "prefill": {

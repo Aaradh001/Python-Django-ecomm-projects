@@ -40,7 +40,7 @@
                                     {% if request.user.profile_pic %}
                                         <img src="{{request.user.profile_pic.url}}" class="rounded-circle" style="max-width: 200px;" alt="Avatar" />
                                     {% else %}
-                                        <img src="{% static './images/avatars/avatar.png' %}" class="rounded-circle" style="max-width: 120px;" alt="Avatar" />
+                                        <img src="{% static 'accounts/images/avatars/avatar.png' %}" class="rounded-circle" style="max-width: 120px;" alt="Avatar" />
                                     {% endif %}
                                 </div>
 

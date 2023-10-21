@@ -11,6 +11,9 @@ urlpatterns = [
     path('enter-otp/<str:uid>/', views.enter_otp, name='enter_otp'),
     path('',views.admin_home, name='admin-home'),
    
+# <-------------------------- Admin-dashboard------------------------->
+    path('sales-data/year/',views.admin_home, name='yearly_sales_data'),
+
 # <--------------------------User-management------------------------->
 
     path('user-management/',views.user_management, name='user_management'),

@@ -1,3 +1,5 @@
+
+from django.http import HttpResponse
 from django.shortcuts import render,redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth import get_user_model
@@ -20,6 +22,8 @@ from django.http import JsonResponse
 from django.db.models import OuterRef, Subquery
 import json
 import datetime
+import calendar
+import pytz
 from django.utils import timezone
 # Order management
 from orders.models import Order, OrderProduct, Payment
@@ -52,39 +56,59 @@ def check_isadmin(view_func, redirect_url="admin_signin"):
 @check_isadmin
 def admin_home(request):
 
-    # print('=====================')
-    # epoch_date = datetime.date(2023, 8, 1)
-    # print(epoch_date.year)
-    # print(epoch_date.strftime("%B"))
-    # print(epoch_date.day)
-    # current_date = datetime.date(2024, 8, 1)
-
+    epoch_date = datetime.date(2020, 8, 1)
+    # current_date = datetime.date(2024, 6, 1)
     # months_list = [date.strftime("%b") for date in [epoch_date.replace(month=(epoch_date.month + i) % 12 + 1, year=epoch_date.year + (epoch_date.month + i - 1) // 12) for i in range((current_date.year - epoch_date.year) * 12 + current_date.month - epoch_date.month )]]
 
-    # print(months_list)
-    
-    # print('=====================')
-
-
     orders = Order.objects.all()
-    # cancelled_orders = orders.filter(order_status = 'Cancelled by User')
-    # successfull_orders = orders.filter(order_status = 'Delivered')
-    recent_orders = orders.filter()
-    today = datetime.date.today()
+    desired_timezone = pytz.timezone('Asia/Kolkata')
+    today = timezone.now().astimezone(desired_timezone)
     start_date = today - datetime.timedelta(days=15)
-    start_date = timezone.make_aware(
-        datetime.datetime.combine(start_date, datetime.time.min),
-        timezone.get_current_timezone()
-        )
-    recent_orders = orders.filter(created_at__range=(start_date, today))
-    categories = Category.objects.all()
+    recent_orders = orders.filter(created_at__range=(start_date, today)).order_by('-created_at')
+
+
+
+
+    year = today.year
+    is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+    if request.method == 'POST' and is_ajax:
+        data = json.load(request)
+        year = data['year']
+
+    delivered_orders = orders.filter(order_status='Delivered', created_at__year = year).prefetch_related('payment')
+    postpaid_orders = delivered_orders.filter(payment__payment_method__method_name = 'COD')
+    prepaid_orders = delivered_orders.exclude(payment__payment_method__method_name = 'COD')
+    print(delivered_orders)
+
+    monthdata_prepaid = {key:0 for key in list(calendar.month_abbr[1:])}
+    monthdata_postpaid = {key:0 for key in list(calendar.month_abbr[1:])}
+
+    for order in prepaid_orders:
+        monthdata_prepaid[datetime.datetime.strftime(order.created_at, "%b")] += 1
+
+    for order in postpaid_orders:
+        monthdata_postpaid[datetime.datetime.strftime(order.created_at, "%b")] += 1
 
     context = {
         'recent_orders': recent_orders,
-        'categories': categories,
+        'months': list(calendar.month_abbr[1:]),
+        'prepaid_orders': list(monthdata_prepaid.values()),
+        'postpaid_orders': list(monthdata_postpaid.values()),
+        'years': [today.year - i for i in range(today.year-epoch_date.year+1)],
+        'y_limit': max(max(monthdata_prepaid.values()), max(monthdata_postpaid.values())) + 5
     }
+    print(context['prepaid_orders'])
+    print(context['postpaid_orders'])
+    print(context['y_limit'])
 
     print("ADMIN-HOME")
+    if is_ajax:
+        return JsonResponse({
+            'status': 'success',
+            'postpaid_orders': context['postpaid_orders'],
+            'prepaid_orders': context['prepaid_orders'],
+            'y_limit': context['y_limit']
+        })
     return render(request, 'admin_templates/admin_home.html', context)
 
 
@@ -160,7 +184,7 @@ def user_create(request):
             is_staff = form.cleaned_data['is_staff']
             phone_number = '+91' + phone_number
             
-            user = User.objects.create(
+            user = User.objects.create_user(
                 first_name = first_name,
                 last_name = last_name,
                 email = email,

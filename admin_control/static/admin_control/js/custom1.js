@@ -140,7 +140,7 @@ function attribute_value_control(attribute_value_id){
       headers: {
         "X-CSRFToken": csrftoken
       },
-
+      
       data: JSON.stringify({checkboxValue: checkboxValue,}),
       success: (data) => {
         console.log(data)
@@ -151,5 +151,27 @@ function attribute_value_control(attribute_value_id){
   });
 }
 
+// ---------------admin chart----------------
+function data_year(func){
+  var year = document.getElementById('year').value
+  $.ajax({
+    type: 'POST',
+    url: `/admin-control/sales-data/year/`,
+    headers: {
+      
+      "X-CSRFToken": csrftoken,
+    },
+    data: JSON.stringify({year: year}),
 
+    success: (data) => {
+      console.log(data);
 
+      document.getElementById('Prepaid-and-COD-sales-head').innerHTML = `Prepaid and COD orders on ${year}`
+      func(data.postpaid_orders, data.prepaid_orders, data.y_limit);
+    },
+    
+    error: (error) => {
+      console.log(error);
+    }
+  });
+}

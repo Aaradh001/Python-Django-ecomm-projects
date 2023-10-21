@@ -1,13 +1,25 @@
-$(function () {
+function sales_chart(postpaid_orders=null, prepaid_orders=null, y_limit=null){
 
-
-  // =====================================
-  // Profit
-  // =====================================
+  if (postpaid_orders || prepaid_orders || y_limit){
+    postpaid_orders = postpaid_orders
+    prepaid_orders = prepaid_orders
+    y_limit = y_limit
+    console.log(postpaid_orders);
+    console.log(prepaid_orders);
+    console.log(y_limit);
+  }else{
+    postpaid_orders = JSON.parse(document.getElementById('postpaid_orders').textContent)
+    prepaid_orders = JSON.parse(document.getElementById('prepaid_orders').textContent)
+    y_limit = JSON.parse(document.getElementById('y_limit').textContent)
+  }
+  console.log("----------after----------");
+  console.log(postpaid_orders);
+  console.log(prepaid_orders);
+  console.log(y_limit);
   var chart = {
     series: [
-      { name: "Prepaid Orders:", data: [355, 390, 300, 350, 390, 180, 355, 390] },
-      { name: "Postpaid Orders:", data: [280, 250, 325, 215, 250, 310, 280, 250] },
+      { name: "Prepaid Orders:", data: prepaid_orders },
+      { name: "Postpaid Orders:", data: postpaid_orders },
     ],
 
     chart: {
@@ -34,17 +46,17 @@ $(function () {
       },
     },
     markers: { size: 0 },
-
+    
     dataLabels: {
       enabled: false,
     },
-
-
+    
+    
     legend: {
       show: false,
     },
-
-
+    
+    
     grid: {
       borderColor: "rgba(0,0,0,0.1)",
       strokeDashArray: 3,
@@ -54,10 +66,9 @@ $(function () {
         },
       },
     },
-
     xaxis: {
       type: "category",
-      categories: ["16/08", "17/08", "18/08", "19/08", "20/08", "21/08", "22/08", "23/08"],
+      categories: JSON.parse(document.getElementById('monthlist').textContent),
       labels: {
         style: { cssClass: "grey--text lighten-2--text fill-color" },
       },
@@ -67,7 +78,7 @@ $(function () {
     yaxis: {
       show: true,
       min: 0,
-      max: 400,
+      max: y_limit,
       tickAmount: 4,
       labels: {
         style: {
@@ -100,11 +111,15 @@ $(function () {
 
 
   };
-
+console.log(prepaid_orders, postpaid_orders, y_limit);
   var chart = new ApexCharts(document.querySelector("#chart"), chart);
   chart.render()
 
+}
 
+
+$(function () {
+  sales_chart();
   // =====================================
   // Breakup
   // =====================================

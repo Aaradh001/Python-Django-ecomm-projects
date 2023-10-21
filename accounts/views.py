@@ -157,7 +157,6 @@ def user_signup(request):
 
             messages.success(request, f'Registration successfull! A verification email has been sent to: {email}. Open this email and click the link to activate your account')
             return redirect('signin')
-
         else:
             context = {
                 'form' : form
